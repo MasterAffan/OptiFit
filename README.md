@@ -78,7 +78,7 @@ OptiFit/
 ## Setup & Running
 1. **Clone the repo:**
    ```
-   git clone <git remote add origin https://github.com/MasterAffan/OptiFit.git>
+   git clone https://github.com/MasterAffan/OptiFit.git
    cd OptiFit
    ```
 2. **Install dependencies:**
