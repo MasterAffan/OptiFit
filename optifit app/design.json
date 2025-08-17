@@ -1,0 +1,1016 @@
+{
+    "app_overview": {
+      "name": "AI Fitness Tracker",
+      "platform": "React Native (Expo)",
+      "navigation_type": "Tab-based",
+      "primary_color_scheme": {
+        "primary": "#1E40AF",
+        "secondary": "#3B82F6", 
+        "success": "#059669",
+        "warning": "#EA580C",
+        "error": "#DC2626",
+        "neutral": "#64748B",
+        "background": "#F8FAFC",
+        "surface": "#FFFFFF",
+        "text_primary": "#0F172A",
+        "text_secondary": "#64748B"
+      },
+      "fonts": {
+        "family": "Inter",
+        "weights": ["Regular", "Medium", "SemiBold", "Bold"],
+        "sizes": {
+          "small": 12,
+          "body": 14,
+          "subtitle": 16,
+          "title": 20,
+          "heading": 24,
+          "large_heading": 28
+        }
+      }
+    },
+    "navigation_structure": {
+      "type": "bottom_tabs",
+      "tabs": [
+        {
+          "name": "Home",
+          "route": "index",
+          "icon": "Chrome",
+          "active_color": "#1E40AF",
+          "inactive_color": "#64748B"
+        },
+        {
+          "name": "Workouts", 
+          "route": "workouts",
+          "icon": "Dumbbell",
+          "active_color": "#1E40AF",
+          "inactive_color": "#64748B"
+        },
+        {
+          "name": "Track",
+          "route": "track", 
+          "icon": "Target",
+          "active_color": "#1E40AF",
+          "inactive_color": "#64748B"
+        },
+        {
+          "name": "Progress",
+          "route": "progress",
+          "icon": "TrendingUp", 
+          "active_color": "#1E40AF",
+          "inactive_color": "#64748B"
+        },
+        {
+          "name": "Profile",
+          "route": "profile",
+          "icon": "User",
+          "active_color": "#1E40AF", 
+          "inactive_color": "#64748B"
+        }
+      ],
+      "tab_bar_style": {
+        "background_color": "#FFFFFF",
+        "border_top_color": "#E2E8F0",
+        "height": 80,
+        "padding_top": 8,
+        "padding_bottom": 8
+      }
+    },
+    "screens": {
+      "home_screen": {
+        "route": "/(tabs)/index",
+        "components": [
+          {
+            "type": "header",
+            "elements": [
+              {
+                "type": "greeting_text",
+                "dynamic_content": "Good morning/afternoon/evening, Alex!",
+                "style": {
+                  "font_size": 24,
+                  "font_weight": "bold",
+                  "color": "#0F172A"
+                }
+              },
+              {
+                "type": "sub_greeting",
+                "content": "Ready to crush your goals?",
+                "style": {
+                  "font_size": 16,
+                  "color": "#64748B"
+                }
+              },
+              {
+                "type": "profile_image",
+                "source": "https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop",
+                "dimensions": "48x48",
+                "border_radius": 24
+              }
+            ]
+          },
+          {
+            "type": "ai_insight_card",
+            "background": "linear_gradient",
+            "gradient_colors": ["#1E40AF", "#3B82F6"],
+            "elements": [
+              {
+                "type": "header",
+                "icon": "Brain",
+                "title": "AI Fitness Insight"
+              },
+              {
+                "type": "insight_text",
+                "content": "Your performance shows 23% improvement this week. Your body is ready for more challenging upper body workouts. Consider increasing weight by 5-10%."
+              },
+              {
+                "type": "action_button",
+                "text": "View Full Analysis",
+                "icon": "ChevronRight"
+              }
+            ]
+          },
+          {
+            "type": "stats_section",
+            "title": "Today's Progress",
+            "layout": "grid_4_columns",
+            "stats": [
+              {
+                "icon": "Flame",
+                "icon_color": "#EA580C",
+                "value": 1247,
+                "label": "Calories",
+                "dynamic": true
+              },
+              {
+                "icon": "Target", 
+                "icon_color": "#059669",
+                "value": 2,
+                "label": "Workouts",
+                "dynamic": true
+              },
+              {
+                "icon": "Clock",
+                "icon_color": "#7C3AED", 
+                "value": 85,
+                "label": "Minutes",
+                "dynamic": true
+              },
+              {
+                "icon": "Trophy",
+                "icon_color": "#DC2626",
+                "value": 7,
+                "label": "Day Streak", 
+                "dynamic": true
+              }
+            ]
+          },
+          {
+            "type": "ai_recommendations_section",
+            "title": "AI Recommendations",
+            "see_all_button": true,
+            "workouts": [
+              {
+                "title": "Upper Body Strength",
+                "subtitle": "Based on your recent progress",
+                "duration": "45 min",
+                "difficulty": "Intermediate",
+                "icon": "💪",
+                "meta_icons": ["Clock", "Zap"]
+              },
+              {
+                "title": "HIIT Cardio Blast", 
+                "subtitle": "AI suggests high intensity today",
+                "duration": "30 min",
+                "difficulty": "Advanced",
+                "icon": "🔥",
+                "meta_icons": ["Clock", "Zap"]
+              },
+              {
+                "title": "Recovery Yoga",
+                "subtitle": "Your muscles need rest", 
+                "duration": "25 min",
+                "difficulty": "Beginner",
+                "icon": "🧘",
+                "meta_icons": ["Clock", "Zap"]
+              }
+            ]
+          },
+          {
+            "type": "quick_actions_section",
+            "title": "Quick Actions",
+            "layout": "grid_2_columns",
+            "actions": [
+              {
+                "icon": "Target",
+                "icon_color": "#1E40AF",
+                "text": "Start Workout"
+              },
+              {
+                "icon": "Calendar",
+                "icon_color": "#059669", 
+                "text": "Schedule"
+              }
+            ]
+          }
+        ],
+        "functionalities": [
+          "dynamic_greeting_based_on_time",
+          "real_time_stats_updates",
+          "ai_insight_generation",
+          "workout_recommendation_engine",
+          "quick_action_navigation"
+        ]
+      },
+      "workouts_screen": {
+        "route": "/(tabs)/workouts",
+        "components": [
+          {
+            "type": "header",
+            "elements": [
+              {
+                "type": "title",
+                "text": "Workouts",
+                "style": {
+                  "font_size": 28,
+                  "font_weight": "bold"
+                }
+              },
+              {
+                "type": "filter_button",
+                "icon": "Filter",
+                "background": "#FFFFFF"
+              }
+            ]
+          },
+          {
+            "type": "search_bar",
+            "placeholder": "Search workouts...",
+            "icon": "Search",
+            "background": "#FFFFFF"
+          },
+          {
+            "type": "category_chips",
+            "layout": "horizontal_scroll",
+            "categories": ["All", "Strength", "Cardio", "Yoga", "HIIT", "Pilates"],
+            "active_style": {
+              "background": "#1E40AF",
+              "text_color": "#FFFFFF"
+            },
+            "inactive_style": {
+              "background": "#FFFFFF",
+              "text_color": "#64748B",
+              "border": "#E2E8F0"
+            }
+          },
+          {
+            "type": "ai_recommended_section",
+            "title": "AI Recommended for You",
+            "ai_badge": true,
+            "featured_workout": {
+              "title": "Personalized Strength Builder",
+              "subtitle": "AI-crafted based on your progress and goals",
+              "duration": "35 min",
+              "difficulty": "Intermediate",
+              "icon": "🧠💪",
+              "play_button": true
+            }
+          },
+          {
+            "type": "workout_list",
+            "title": "All Workouts",
+            "workouts": [
+              {
+                "id": 1,
+                "title": "Full Body HIIT Blast",
+                "category": "HIIT",
+                "duration": "30 min",
+                "difficulty": "Advanced",
+                "calories": "450-600",
+                "equipment": "No Equipment",
+                "rating": 4.8,
+                "participants": 1247,
+                "icon": "🏋️"
+              },
+              {
+                "id": 2,
+                "title": "Upper Body Strength",
+                "category": "Strength", 
+                "duration": "45 min",
+                "difficulty": "Intermediate",
+                "calories": "300-400",
+                "equipment": "Dumbbells",
+                "rating": 4.9,
+                "participants": 892,
+                "icon": "🏋️"
+              },
+              {
+                "id": 3,
+                "title": "Morning Yoga Flow",
+                "category": "Yoga",
+                "duration": "25 min", 
+                "difficulty": "Beginner",
+                "calories": "150-200",
+                "equipment": "Yoga Mat",
+                "rating": 4.7,
+                "participants": 2156,
+                "icon": "🏋️"
+              },
+              {
+                "id": 4,
+                "title": "Core Crusher Circuit",
+                "category": "Strength",
+                "duration": "20 min",
+                "difficulty": "Intermediate", 
+                "calories": "250-350",
+                "equipment": "No Equipment",
+                "rating": 4.6,
+                "participants": 734,
+                "icon": "🏋️"
+              },
+              {
+                "id": 5,
+                "title": "Cardio Dance Party",
+                "category": "Cardio",
+                "duration": "40 min",
+                "difficulty": "Beginner",
+                "calories": "400-550", 
+                "equipment": "No Equipment",
+                "rating": 4.8,
+                "participants": 1543,
+                "icon": "🏋️"
+              }
+            ]
+          }
+        ],
+        "functionalities": [
+          "search_workouts",
+          "filter_by_category", 
+          "ai_workout_recommendations",
+          "workout_difficulty_color_coding",
+          "rating_and_participant_display",
+          "equipment_requirements_display"
+        ]
+      },
+      "track_screen": {
+        "route": "/(tabs)/track",
+        "components": [
+          {
+            "type": "header",
+            "elements": [
+              {
+                "type": "title",
+                "text": "Workout Tracker"
+              },
+              {
+                "type": "timer_container",
+                "icon": "Timer",
+                "timer_display": "00:00",
+                "dynamic": true
+              }
+            ]
+          },
+          {
+            "type": "workout_controls",
+            "layout": "horizontal_buttons",
+            "buttons": [
+              {
+                "type": "start_pause_button",
+                "icon_play": "Play",
+                "icon_pause": "Pause", 
+                "text_start": "Start Workout",
+                "text_pause": "Pause Workout",
+                "background": "#059669"
+              },
+              {
+                "type": "stop_button",
+                "icon": "Square",
+                "text": "Stop Workout",
+                "background": "#DC2626"
+              }
+            ]
+          },
+          {
+            "type": "ai_form_analysis_section",
+            "title": "AI Form Analysis",
+            "card": {
+              "icon": "Brain",
+              "title": "Start Form Check",
+              "description": "Use AI to analyze your workout form and get real-time feedback"
+            }
+          },
+          {
+            "type": "camera_permission_screen",
+            "elements": [
+              {
+                "type": "camera_icon",
+                "icon": "Camera",
+                "size": 48
+              },
+              {
+                "type": "permission_title",
+                "text": "Camera Access Required"
+              },
+              {
+                "type": "permission_description", 
+                "text": "We need camera access to analyze your workout form and provide AI-powered feedback."
+              },
+              {
+                "type": "grant_permission_button",
+                "text": "Grant Camera Access"
+              }
+            ]
+          },
+          {
+            "type": "camera_view",
+            "overlay_elements": [
+              {
+                "type": "analysis_indicator",
+                "icon": "Brain",
+                "text": "AI Analyzing Form...",
+                "background": "rgba(30, 64, 175, 0.9)"
+              },
+              {
+                "type": "camera_controls",
+                "buttons": [
+                  {
+                    "type": "flip_camera",
+                    "icon": "RotateCcw"
+                  },
+                  {
+                    "type": "stop_analysis",
+                    "icon": "Square",
+                    "background": "rgba(220, 38, 38, 0.8)"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "analysis_results_section",
+            "title": "Form Analysis Results",
+            "components": [
+              {
+                "type": "score_card",
+                "title": "Form Score",
+                "score": "85/100",
+                "progress_bar": true
+              },
+              {
+                "type": "feedback_section",
+                "title": "AI Feedback",
+                "feedback_items": [
+                  {
+                    "type": "good",
+                    "icon": "CheckCircle",
+                    "icon_color": "#059669",
+                    "message": "Excellent back posture maintained"
+                  },
+                  {
+                    "type": "warning",
+                    "icon": "AlertTriangle", 
+                    "icon_color": "#EA580C",
+                    "message": "Slightly bend knees more on descent"
+                  },
+                  {
+                    "type": "good",
+                    "icon": "CheckCircle",
+                    "icon_color": "#059669", 
+                    "message": "Good range of motion"
+                  }
+                ]
+              },
+              {
+                "type": "suggestions_section",
+                "title": "Improvement Suggestions",
+                "suggestions": [
+                  "Focus on controlled movement",
+                  "Keep core engaged throughout", 
+                  "Maintain steady breathing pattern"
+                ]
+              }
+            ]
+          },
+          {
+            "type": "quick_stats",
+            "layout": "grid_3_columns",
+            "stats": [
+              {
+                "value": 47,
+                "label": "Reps Today"
+              },
+              {
+                "value": 12,
+                "label": "Sets Completed"
+              },
+              {
+                "value": "85%",
+                "label": "Avg Form Score"
+              }
+            ]
+          }
+        ],
+        "functionalities": [
+          "workout_timer",
+          "start_pause_stop_workout",
+          "camera_permission_handling",
+          "ai_form_analysis",
+          "real_time_camera_feedback",
+          "form_scoring_system",
+          "improvement_suggestions",
+          "workout_statistics_tracking"
+        ]
+      },
+      "progress_screen": {
+        "route": "/(tabs)/progress",
+        "components": [
+          {
+            "type": "header",
+            "elements": [
+              {
+                "type": "title",
+                "text": "Progress"
+              },
+              {
+                "type": "calendar_button",
+                "icon": "Calendar"
+              }
+            ]
+          },
+          {
+            "type": "time_period_selector",
+            "layout": "horizontal_scroll",
+            "periods": ["Week", "Month", "3 Months", "Year"],
+            "active_style": {
+              "background": "#1E40AF",
+              "text_color": "#FFFFFF"
+            }
+          },
+          {
+            "type": "stats_overview",
+            "title": "This Week",
+            "layout": "grid_2x2",
+            "stats": [
+              {
+                "icon": "Target",
+                "icon_color": "#1E40AF",
+                "value": 5,
+                "label": "Workouts",
+                "change": "+2 from last week"
+              },
+              {
+                "icon": "Flame",
+                "icon_color": "#EA580C", 
+                "value": 2450,
+                "label": "Calories",
+                "change": "+15% from last week"
+              },
+              {
+                "icon": "Clock",
+                "icon_color": "#7C3AED",
+                "value": 275,
+                "label": "Minutes", 
+                "change": "+45 min this week"
+              },
+              {
+                "icon": "Zap",
+                "icon_color": "#059669",
+                "value": 12,
+                "label": "Day Streak",
+                "change": "Personal best!"
+              }
+            ]
+          },
+          {
+            "type": "chart_section",
+            "title": "Workout Frequency",
+            "chart": {
+              "type": "bar_chart",
+              "data": [
+                {"week": "W1", "workouts": 3},
+                {"week": "W2", "workouts": 4},
+                {"week": "W3", "workouts": 5}, 
+                {"week": "W4", "workouts": 5}
+              ],
+              "description": "Workouts completed per week"
+            }
+          },
+          {
+            "type": "ai_insights_section",
+            "title": "AI Insights",
+            "insights": [
+              {
+                "title": "Workout Consistency Improved",
+                "description": "23% increase in weekly workout frequency",
+                "trend": "up",
+                "value": "+23%",
+                "icon": "TrendingUp",
+                "icon_color": "#059669"
+              },
+              {
+                "title": "Strength Gains Detected",
+                "description": "AI detected 15% improvement in form quality",
+                "trend": "up", 
+                "value": "+15%",
+                "icon": "TrendingUp",
+                "icon_color": "#059669"
+              },
+              {
+                "title": "Recovery Optimization",
+                "description": "Consider adding one more rest day",
+                "trend": "neutral",
+                "value": "Recommended",
+                "icon": "Target",
+                "icon_color": "#EA580C"
+              }
+            ]
+          },
+          {
+            "type": "achievements_section",
+            "title": "Achievements",
+            "see_all_button": true,
+            "achievements": [
+              {
+                "id": 1,
+                "title": "Consistency Champion",
+                "description": "7 day workout streak",
+                "icon": "🔥",
+                "earned": true,
+                "date": "2 days ago",
+                "badge": "Award"
+              },
+              {
+                "id": 2,
+                "title": "Strength Builder", 
+                "description": "Increased weight by 20%",
+                "icon": "💪",
+                "earned": true,
+                "date": "1 week ago",
+                "badge": "Award"
+              },
+              {
+                "id": 3,
+                "title": "Cardio King",
+                "description": "Complete 100 cardio sessions",
+                "icon": "❤️",
+                "earned": false,
+                "progress": 78
+              }
+            ]
+          },
+          {
+            "type": "personal_records_section",
+            "title": "Personal Records",
+            "layout": "grid_2_columns",
+            "records": [
+              {
+                "value": "125 lbs",
+                "label": "Bench Press",
+                "status": "New PR!"
+              },
+              {
+                "value": "8:42",
+                "label": "Mile Time", 
+                "status": "Last week"
+              }
+            ]
+          }
+        ],
+        "functionalities": [
+          "time_period_filtering",
+          "progress_statistics_calculation",
+          "workout_frequency_charting",
+          "ai_insight_generation",
+          "achievement_tracking",
+          "progress_bar_calculations",
+          "personal_records_tracking"
+        ]
+      },
+      "profile_screen": {
+        "route": "/(tabs)/profile",
+        "components": [
+          {
+            "type": "header",
+            "elements": [
+              {
+                "type": "title",
+                "text": "Profile"
+              },
+              {
+                "type": "settings_button",
+                "icon": "Settings"
+              }
+            ]
+          },
+          {
+            "type": "profile_card",
+            "elements": [
+              {
+                "type": "profile_image_section",
+                "image_source": "https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
+                "dimensions": "80x80",
+                "edit_button": {
+                  "icon": "Edit",
+                  "position": "bottom_right"
+                }
+              },
+              {
+                "type": "user_info",
+                "name": "Alex Johnson",
+                "level": "Intermediate Level",
+                "join_date": "Joined January 2024"
+              },
+              {
+                "type": "stats_container",
+                "layout": "horizontal_3_columns",
+                "stats": [
+                  {
+                    "value": 147,
+                    "label": "Workouts"
+                  },
+                  {
+                    "value": 12,
+                    "label": "Day Streak"
+                  },
+                  {
+                    "value": 8,
+                    "label": "PRs"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "ai_coaching_card",
+            "title": "AI Personal Coach",
+            "subtitle": "Get personalized workout recommendations",
+            "toggle_switch": true,
+            "status_message": "🧠 AI is analyzing your progress and will suggest your next workout in 2 hours"
+          },
+          {
+            "type": "recent_achievements_section",
+            "title": "Recent Achievements",
+            "see_all_button": true,
+            "achievements": [
+              {
+                "title": "Consistency Champion",
+                "icon": "🔥",
+                "date": "2 days ago"
+              },
+              {
+                "title": "Strength Builder",
+                "icon": "💪", 
+                "date": "1 week ago"
+              },
+              {
+                "title": "Form Master",
+                "icon": "⭐",
+                "date": "2 weeks ago"
+              }
+            ]
+          },
+          {
+            "type": "menu_section",
+            "menu_items": [
+              {
+                "icon": "User",
+                "title": "Personal Information",
+                "subtitle": "Edit your profile details",
+                "action": "navigate"
+              },
+              {
+                "icon": "Target",
+                "title": "Goals & Preferences", 
+                "subtitle": "Set your fitness goals",
+                "action": "navigate"
+              },
+              {
+                "icon": "Bell",
+                "title": "Notifications",
+                "subtitle": "Manage notification settings",
+                "action": "toggle",
+                "toggle_state": true
+              },
+              {
+                "icon": "Shield",
+                "title": "Privacy & Security",
+                "subtitle": "Control your data",
+                "action": "navigate"
+              },
+              {
+                "icon": "HelpCircle",
+                "title": "Help & Support",
+                "subtitle": "Get help and contact us", 
+                "action": "navigate"
+              }
+            ]
+          },
+          {
+            "type": "workout_summary_section",
+            "title": "Workout Summary",
+            "layout": "grid_2_columns",
+            "summary_cards": [
+              {
+                "icon": "Calendar",
+                "icon_color": "#1E40AF",
+                "value": "149 hrs",
+                "label": "Total Time"
+              },
+              {
+                "icon": "Trophy",
+                "icon_color": "#EA580C",
+                "value": "18,750",
+                "label": "Calories Burned"
+              }
+            ]
+          },
+          {
+            "type": "logout_button",
+            "icon": "LogOut",
+            "text": "Sign Out",
+            "style": {
+              "border_color": "#FCA5A5",
+              "text_color": "#DC2626"
+            }
+          }
+        ],
+        "functionalities": [
+          "profile_image_editing",
+          "user_statistics_display",
+          "ai_coaching_toggle",
+          "notification_settings_toggle",
+          "menu_navigation",
+          "workout_summary_calculations",
+          "logout_functionality"
+        ]
+      }
+    },
+    "shared_components": {
+      "cards": {
+        "base_card": {
+          "background": "#FFFFFF",
+          "border_radius": 12,
+          "shadow": {
+            "color": "#0F172A",
+            "offset": {"width": 0, "height": 2},
+            "opacity": 0.05,
+            "radius": 8,
+            "elevation": 2
+          }
+        },
+        "featured_card": {
+          "background": "#FFFFFF", 
+          "border_radius": 16,
+          "shadow": {
+            "color": "#0F172A",
+            "offset": {"width": 0, "height": 4},
+            "opacity": 0.1,
+            "radius": 12,
+            "elevation": 5
+          }
+        }
+      },
+      "buttons": {
+        "primary_button": {
+          "background": "#1E40AF",
+          "text_color": "#FFFFFF",
+          "border_radius": 12,
+          "padding": {"horizontal": 16, "vertical": 12}
+        },
+        "secondary_button": {
+          "background": "#FFFFFF",
+          "text_color": "#1E40AF", 
+          "border": "#E2E8F0",
+          "border_radius": 12,
+          "padding": {"horizontal": 16, "vertical": 12}
+        },
+        "icon_button": {
+          "width": 40,
+          "height": 40,
+          "border_radius": 20,
+          "background": "#FFFFFF",
+          "shadow": "base_shadow"
+        }
+      },
+      "inputs": {
+        "search_bar": {
+          "background": "#FFFFFF",
+          "border_radius": 12,
+          "padding": {"horizontal": 16, "vertical": 12},
+          "shadow": "base_shadow",
+          "icon": "Search",
+          "placeholder_color": "#64748B"
+        }
+      },
+      "stats": {
+        "stat_card": {
+          "background": "#FFFFFF",
+          "border_radius": 12,
+          "padding": 16,
+          "alignment": "center",
+          "shadow": "base_shadow"
+        }
+      }
+    },
+    "ai_features": {
+      "workout_recommendations": {
+        "description": "AI analyzes user progress and suggests personalized workouts",
+        "data_sources": ["workout_history", "performance_metrics", "user_goals"],
+        "recommendation_types": ["strength", "cardio", "recovery", "hiit"],
+        "personalization_factors": ["fitness_level", "available_time", "equipment", "preferences"]
+      },
+      "form_analysis": {
+        "description": "Real-time exercise form analysis using camera",
+        "features": ["posture_detection", "movement_tracking", "form_scoring", "improvement_suggestions"],
+        "feedback_types": ["good", "warning", "error"],
+        "scoring_range": "0-100"
+      },
+      "progress_insights": {
+        "description": "AI-generated insights about user progress and trends",
+        "metrics_analyzed": ["workout_frequency", "performance_improvement", "consistency", "form_quality"],
+        "insight_types": ["improvement_detected", "recommendation", "warning", "achievement"]
+      },
+      "coaching": {
+        "description": "Personalized AI coaching with adaptive recommendations",
+        "features": ["workout_scheduling", "rest_day_recommendations", "intensity_adjustments", "goal_tracking"],
+        "toggle_option": true
+      }
+    },
+    "data_models": {
+      "user": {
+        "name": "string",
+        "level": "string",
+        "join_date": "date",
+        "profile_image": "url",
+        "stats": {
+          "workouts_completed": "number",
+          "total_minutes": "number", 
+          "current_streak": "number",
+          "personal_records": "number",
+          "calories_burned": "number"
+        },
+        "preferences": {
+          "notifications_enabled": "boolean",
+          "ai_coaching_enabled": "boolean"
+        }
+      },
+      "workout": {
+        "id": "number",
+        "title": "string",
+        "category": "string",
+        "duration": "string",
+        "difficulty": "string",
+        "calories": "string",
+        "equipment": "string",
+        "rating": "number",
+        "participants": "number",
+        "image": "url"
+      },
+      "achievement": {
+        "id": "number",
+        "title": "string", 
+        "description": "string",
+        "icon": "string",
+        "earned": "boolean",
+        "date": "string",
+        "progress": "number"
+      },
+      "workout_session": {
+        "date": "date",
+        "duration": "number",
+        "calories_burned": "number",
+        "exercises": "array",
+        "form_scores": "array"
+      }
+    },
+    "animations_and_interactions": {
+      "micro_interactions": [
+        "button_press_feedback",
+        "card_tap_animation", 
+        "tab_switch_transition",
+        "loading_states",
+        "progress_bar_animations"
+      ],
+      "transitions": [
+        "screen_navigation_slide",
+        "modal_slide_up",
+        "fade_in_content",
+        "scale_on_press"
+      ],
+      "gestures": [
+        "horizontal_scroll_categories",
+        "pull_to_refresh",
+        "swipe_navigation",
+        "pinch_to_zoom_charts"
+      ]
+    },
+    "permissions_required": [
+      "camera_access",
+      "notification_permissions"
+    ],
+    "external_integrations": [
+      "pexels_images",
+      "expo_camera",
+      "expo_linear_gradient",
+      "lucide_icons"
+    ]
+  }
+  
