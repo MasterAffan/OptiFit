@@ -73,61 +73,17 @@ Ready to contribute? Follow our comprehensive setup guide to get both frontend a
 
 A huge thank you to all the amazing contributors who have helped make OptiFit better!
 
-### 🏆 Founding Contributors
+<p align="center">
+  <a href="https://github.com/MasterAffan/optifit/graphs/contributors">
+    <img src="https://contrib.rocks/image?repo=MasterAffan/optifit" alt="Contributors" />
+  </a>
+</p>
 
-<table>
-  <tr>
-    <td align="center">
-      <a href="https://github.com/Adez017">
-        <img src="https://github.com/Adez017.png" width="100px;" alt="Adez017"/>
-        <br />
-        <sub><b>Adez017</b></sub>
-      </a>
-      <br />
-      <a href="https://github.com/MasterAffan/optifit/commits?author=Adez017" title="Code">💻</a>
-    </td>
-    <td align="center">
-      <a href="https://github.com/shubhranshu-sahu">
-        <img src="https://github.com/shubhranshu-sahu.png" width="100px;" alt="shubhranshu-sahu"/>
-        <br />
-        <sub><b>shubhranshu-sahu</b></sub>
-      </a>
-      <br />
-      <a href="https://github.com/MasterAffan/optifit/commits?author=shubhranshu-sahu" title="Code">💻</a>
-    </td>
-    <td align="center">
-      <a href="https://github.com/Meghana-2124">
-        <img src="https://github.com/Meghana-2124.png" width="100px;" alt="Meghana-2124"/>
-        <br />
-        <sub><b>Meghana-2124</b></sub>
-      </a>
-      <br />
-      <a href="https://github.com/MasterAffan/optifit/commits?author=Meghana-2124" title="Code">💻</a>
-    </td>
-    <td align="center">
-      <a href="https://github.com/Jai-76">
-        <img src="https://github.com/Jai-76.png" width="100px;" alt="Jai-76"/>
-        <br />
-        <sub><b>Jai-76</b></sub>
-      </a>
-      <br />
-      <a href="https://github.com/MasterAffan/optifit/commits?author=Jai-76" title="Code">💻</a>
-    </td>
-  </tr>
-</table>
+<!-- 
+If your name is not appearing in the contributors list above, please add it here manually. 
+-->
+<sub><b>All contributors: Adez017, shubhranshu-sahu, Meghana-2124, Jai-76</b></sub>
 
-### 🌟 All Contributors
-
-<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
-<!-- prettier-ignore-start -->
-<!-- markdownlint-disable -->
-<a href="https://github.com/MasterAffan/optifit/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=MasterAffan/optifit" alt="Contributors" />
-</a>
-
-<!-- markdownlint-restore -->
-<!-- prettier-ignore-end -->
-<!-- ALL-CONTRIBUTORS-LIST:END -->
 
 ## Contributing
 
