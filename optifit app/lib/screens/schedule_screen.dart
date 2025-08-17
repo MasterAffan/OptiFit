@@ -1,9 +1,12 @@
+
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../theme/theme.dart';
 import '../widgets/app_button.dart';
 import '../widgets/custom_snackbar.dart';
+import '../widgets/custom_time_picker.dart';
+
 
 class ScheduleScreen extends StatefulWidget {
   const ScheduleScreen({super.key});
@@ -13,27 +16,36 @@ class ScheduleScreen extends StatefulWidget {
 }
 
 class _ScheduleScreenState extends State<ScheduleScreen> {
+  int _selectedHour = 6;
+  int _selectedMinute = 0;
+  String _selectedPeriod = 'AM';
+
+  void _updateSelectedTimeSlot() {
+    final hourStr = _selectedHour.toString(); // No leading zero for saving
+    final minuteStr = _selectedMinute.toString().padLeft(2, '0'); // Leading zero for minutes
+    selectedTimeSlot = '$hourStr:$minuteStr $_selectedPeriod';
+  }
+
+  String _formatTimeForDisplay(String? timeSlot) {
+    if (timeSlot == null) return 'No time selected';
+    
+    final parts = timeSlot.split(' ');
+    if (parts.length != 2) return timeSlot;
+    
+    final timePart = parts[0];
+    final period = parts[1];
+    final timeParts = timePart.split(':');
+    
+    if (timeParts.length != 2) return timeSlot;
+    
+    final hour = timeParts[0].padLeft(2, '0'); // Add leading zero for display
+    final minute = timeParts[1];
+    
+    return '$hour:$minute $period';
+  }
   DateTime selectedDate = DateTime.now();
   String? selectedTimeSlot;
   String? selectedWorkout;
-
-  final List<String> timeSlots = [
-    '6:00 AM',
-    '7:00 AM',
-    '8:00 AM',
-    '9:00 AM',
-    '10:00 AM',
-    '11:00 AM',
-    '12:00 PM',
-    '1:00 PM',
-    '2:00 PM',
-    '3:00 PM',
-    '4:00 PM',
-    '5:00 PM',
-    '6:00 PM',
-    '7:00 PM',
-    '8:00 PM',
-  ];
 
   final List<Map<String, dynamic>> workouts = [
     {
@@ -72,8 +84,13 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
 
   @override
   void initState() {
-    super.initState();
-    _loadScheduledWorkouts();
+  super.initState();
+  final now = TimeOfDay.now();
+  _selectedHour = (now.hour == 0 || now.hour > 12) ? (now.hour - 12) : (now.hour == 0 ? 12 : now.hour);
+  _selectedMinute = now.minute;
+  _selectedPeriod = now.hour >= 12 ? 'PM' : 'AM';
+  _updateSelectedTimeSlot();
+  _loadScheduledWorkouts();
   }
 
   Future<void> _loadScheduledWorkouts() async {
@@ -241,7 +258,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
 
             const SizedBox(height: 24),
 
-            // Time Slots
+            // Custom Time Picker
             Container(
               width: double.infinity,
               padding: AppTheme.cardPadding,
@@ -253,29 +270,65 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Select Time',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
+                  Row(
+                    children: [
+                      Text(
+                        'Select Time',
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const Spacer(),
+                      GestureDetector(
+                        onTap: () {
+                          showCustomSnackBar(
+                            context,
+                            message: '💡 Tip: Double-tap on hour or minute fields to edit with keyboard',
+                            type: SnackBarType.info,
+                            duration: const Duration(seconds: 3),
+                          );
+                        },
+                        child: Container(
+                          width: 24,
+                          height: 24,
+                          decoration: BoxDecoration(
+                            color: AppTheme.textSecondary.withOpacity(0.1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.info_outline,
+                            size: 16,
+                            color: AppTheme.textSecondary,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 16),
-                  Wrap(
-                    spacing: 12,
-                    runSpacing: 12,
-                    children: timeSlots
-                        .map(
-                          (time) => _TimeSlotChip(
-                            time: time,
-                            isSelected: selectedTimeSlot == time,
-                            onTap: () {
-                              setState(() {
-                                selectedTimeSlot = time;
-                              });
-                            },
-                          ),
-                        )
-                        .toList(),
+                  TimePickerMock(
+                    initialTime: TimeOfDay(
+                      hour: _selectedPeriod == 'AM' 
+                        ? (_selectedHour == 12 ? 0 : _selectedHour)
+                        : (_selectedHour == 12 ? 12 : _selectedHour + 12),
+                      minute: _selectedMinute,
+                    ),
+                    onChanged: (TimeOfDay time) {
+                      setState(() {
+                        _selectedHour = time.hour == 0 ? 12 : (time.hour > 12 ? time.hour - 12 : time.hour);
+                        _selectedMinute = time.minute;
+                        _selectedPeriod = time.hour >= 12 ? 'PM' : 'AM';
+                        _updateSelectedTimeSlot();
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    selectedTimeSlot != null
+                        ? 'Selected: ${_formatTimeForDisplay(selectedTimeSlot)}'
+                        : 'No time selected',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: AppTheme.textSecondary,
+                    ),
                   ),
                 ],
               ),
@@ -518,41 +571,6 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   }
 }
 
-class _TimeSlotChip extends StatelessWidget {
-  final String time;
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  const _TimeSlotChip({
-    required this.time,
-    required this.isSelected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color: isSelected ? AppTheme.primary : AppTheme.surface,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: isSelected ? AppTheme.primary : AppTheme.divider,
-          ),
-        ),
-        child: Text(
-          time,
-          style: TextStyle(
-            color: isSelected ? Colors.white : AppTheme.textPrimary,
-            fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-          ),
-        ),
-      ),
-    );
-  }
-}
 
 class _WorkoutOption extends StatelessWidget {
   final Map<String, dynamic> workout;
