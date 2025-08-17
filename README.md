@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://via.placeholder.com/150x150/1E40AF/FFFFFF?text=OptiFit" alt="OptiFit Logo" width="150" height="150">
+  <img src="optifit app/assets/applogo.png" alt="OptiFit Logo" width="150" height="150">
   <h1>OptiFit: AI-Powered Fitness Trainer</h1>
   <p><strong>🏆 Selected for GirlScript Summer of Code 2025 (GSSoC '25) 🏆</strong></p>
   <p>Transform your workouts with AI-driven form analysis and personalized feedback.</p>
