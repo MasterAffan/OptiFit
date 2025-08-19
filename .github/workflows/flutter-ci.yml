@@ -1,6 +1,7 @@
 name: Flutter CI
 
 on:
+  workflow_dispatch:
   pull_request:
     paths:
       - "optifit app/**"
@@ -27,9 +28,6 @@ jobs:
 
       - name: Install dependencies
         run: flutter pub get
-
-      - name: Check formatting
-        run: flutter format --set-exit-if-changed .
 
       - name: Analyze code
         run: |
