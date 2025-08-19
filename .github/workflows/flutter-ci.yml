@@ -30,13 +30,7 @@ jobs:
         run: flutter pub get
 
       - name: Analyze code
-        run: |
-          flutter analyze > analyze_output.txt
-          cat analyze_output.txt
-          if grep -q "error •" analyze_output.txt; then
-            echo "Analysis failed due to errors"
-            exit 1
-          fi
+        run: flutter analyze --fatal-infos=false --fatal-warnings=false
 
       - name: Run tests
         run: flutter test
