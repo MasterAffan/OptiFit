@@ -1,40 +1,24 @@
-## Which issue does this PR close?
+## Description
+Please explain the purpose of this PR and what it changes.
 
-<!--
-We generally require a GitHub issue to be filed for all bug fixes and enhancements and this helps us generate change logs for our releases. You can link an issue to this PR using the GitHub syntax. For example `Closes #123` indicates that this PR will close issue #123.
--->
+## Related Issue
+Link the issue this PR addresses (e.g., Closes #123).
 
-- Closes #.
+## Type of Change
+- [ ] Bug fix
+- [ ] New feature
+- [ ] Enhancement
+- [ ] Documentation
+- [ ] Other (please specify)
 
-## Rationale for this change
+## How Has This Been Tested?
+Explain the tests you ran and how reviewers can verify the changes.
 
-<!--
- Why are you proposing this change? If this is already explained clearly in the issue then this section is not needed.
- Explaining clearly why changes are proposed helps reviewers understand your changes and offer better suggestions for fixes.  
--->
+## Screenshots (if applicable)
 
-## What changes are included in this PR?
-
-<!--
-There is no need to duplicate the description in the issue here but it is sometimes worth providing a summary of the individual changes in this PR.
--->
-
-## Are these changes tested?
-
-<!--
-We typically require tests for all PRs in order to:
-1. Prevent the code from being accidentally broken by subsequent changes
-2. Serve as another way to document the expected behavior of the code
-
-If tests are not included in your PR, please explain why (for example, are they covered by existing tests)?
--->
-
-## Are there any user-facing changes?
-
-<!--
-If there are user-facing changes then we may require documentation to be updated before approving the PR.
--->
-
-<!--
-If there are any breaking changes to public APIs, please add the `api change` label.
--->
+## Checklist
+- [ ] My code follows the project’s style guidelines
+- [ ] I have performed a self-review of my code
+- [ ] I have commented my code where necessary
+- [ ] I have added/updated tests (if applicable)
+- [ ] Documentation has been updated (if needed)

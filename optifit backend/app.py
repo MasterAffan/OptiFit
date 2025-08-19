@@ -1,10 +1,7 @@
 import ssl
-# This is a workaround for SSL verification issues on some systems.
-# It should be used with caution and only in development environments.
 try:
     _create_unverified_https_context = ssl._create_unverified_context
 except AttributeError:
-    # Legacy Python that doesn't verify HTTPS certificates by default
     pass
 else:
     ssl._create_default_https_context = _create_unverified_https_context

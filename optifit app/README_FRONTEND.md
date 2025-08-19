@@ -12,7 +12,17 @@ This is the frontend for the OptiFit application, a Flutter-based mobile app for
 
 ## Screenshots
 
-*(Coming Soon: Add screenshots of the app here to showcase the UI.)*
+<p align="center">
+  <img src="./assets/screenshots/ss1.png" width="200"/>
+  <img src="./assets/screenshots/ss2.png" width="200"/>
+  <img src="./assets/screenshots/ss3.png" width="200"/>
+  <img src="./assets/screenshots/ss4.png" width="200"/>
+  <br/>
+  <img src="./assets/screenshots/ss5.png" width="200"/>
+  <img src="./assets/screenshots/ss6.png" width="200"/>
+  <img src="./assets/screenshots/ss7.png" width="200"/>
+  <img src="./assets/screenshots/ss8.png" width="200"/>
+</p>
 
 ## Architecture
 

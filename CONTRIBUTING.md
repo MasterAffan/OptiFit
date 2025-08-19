@@ -19,7 +19,7 @@ Thank you for your interest in contributing to OptiFit! This project is part of 
 
 ### 3. GSSoC Points System & Labels
 
-**Labels to use:**
+**Labels:**
 - `gssoc` - Required for all GSSoC contributions
 - `level1` - 10 points
 - `level2` - 25 points
@@ -139,7 +139,6 @@ git push origin issue-42-fix-login-validation
 
 ### 7. Getting Help
 
-- **Discord/Slack:** Join our community channels for discussions.
 - **Issues:** Ask questions in the issue comments.
 - **Discussions:** Use GitHub Discussions for general queries.
 
