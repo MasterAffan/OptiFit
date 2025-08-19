@@ -1,13 +1,10 @@
-name: Python CI
-
-on:
-  pull_request:
-  push:
-    branches: [ main ]
-
 jobs:
   python:
     runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: "optifit backend"
 
     steps:
       - name: Checkout repo
