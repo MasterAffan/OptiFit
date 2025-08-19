@@ -32,7 +32,13 @@ jobs:
         run: flutter format --set-exit-if-changed .
 
       - name: Analyze code
-        run: flutter analyze
+        run: |
+          flutter analyze > analyze_output.txt
+          cat analyze_output.txt
+          if grep -q "error •" analyze_output.txt; then
+            echo "Analysis failed due to errors"
+            exit 1
+          fi
 
       - name: Run tests
         run: flutter test
