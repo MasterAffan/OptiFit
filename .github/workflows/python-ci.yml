@@ -8,6 +8,7 @@ on:
   pull_request:
     paths:
       - "optifit backend/**"
+  workflow_dispatch:
 
 jobs:
   python:
