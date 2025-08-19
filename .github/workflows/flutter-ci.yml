@@ -2,12 +2,19 @@ name: Flutter CI
 
 on:
   pull_request:
+    paths:
+      - "optifit app/**"
   push:
     branches: [ main ]
+    paths:
+      - "optifit app/**"
 
 jobs:
   flutter:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: optifit app
 
     steps:
       - name: Checkout repo
