@@ -1,0 +1,52 @@
+name: "CodeQL Advanced"
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'optifit app/**'
+      - 'optifit backend/**'
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - 'optifit app/**'
+      - 'optifit backend/**'
+  workflow_dispatch:
+  schedule:
+    - cron: '17 7 * * 3'
+
+jobs:
+  analyze:
+    name: Analyze (${{ matrix.language }})
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      packages: read
+      actions: read
+      contents: read
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - language: dart
+            build-mode: none
+          - language: python
+            build-mode: none
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: ${{ matrix.build-mode }}
+
+      # No flutter test or autobuild steps included
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:${{matrix.language}}"
