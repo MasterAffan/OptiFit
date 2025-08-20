@@ -68,7 +68,7 @@ This repository is a monorepo containing both the frontend mobile application an
 
 <p align="center">
   <a href="optifit app/assets/videos/demo.mp4">
-    <img src="optifit app/assets/applogo.png" alt="Click to watch demo video" width="600">
+    <img src="optifit app/assets/applogo.png" alt="Click to watch demo video" width="300">
   </a>
 </p>
 
