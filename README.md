@@ -54,20 +54,6 @@ OptiFit is an innovative mobile application designed to revolutionize your worko
 - **Track Your Progress:** Monitor your performance over time with detailed statistics and charts.
 - **Personalized Workouts:** Coming soon: AI-generated workout plans tailored to your goals and abilities.
 
----
-
-## 🎥 Demo
-
-<p align="center">
-  <a href="https://youtube.com/shorts/_uV-pqBFSZ8?si=DmzEoXbNnHxfGHNK" target="_blank">
-    <img src="https://img.youtube.com/vi/_uV-pqBFSZ8/0.jpg" alt="OptiFit Demo Video" width="300">
-  </a>
-</p>
-
-> Click the image above to watch the demo on YouTube.
-
----
-
 ## Project Structure
 
 This repository is a monorepo containing both the frontend mobile application and the backend server.
@@ -77,6 +63,18 @@ This repository is a monorepo containing both the frontend mobile application an
 - **`optifit backend/`**: The Python-based Flask server that handles video processing and AI analysis.
   - [**Backend README**](./optifit%20backend/README_BACKEND.md)
 
+
+## 🎥 Demo
+
+<p align="center">
+  <a href="https://youtube.com/shorts/_uV-pqBFSZ8?si=DmzEoXbNnHxfGHNK" target="_blank">
+    <img src="https://img.youtube.com/vi/_uV-pqBFSZ8/0.jpg" alt="OptiFit Demo Video" width="600">
+  </a>
+</p>
+
+> Click the image above to watch the demo on YouTube.
+>
+> 
 ## Getting Started
 
 Ready to contribute? Follow our comprehensive setup guide to get both frontend and backend running:
@@ -93,7 +91,11 @@ A huge thank you to all the amazing contributors who have helped make OptiFit be
   </a>
 </p>
 
-<sub><b>All contributors: Adez017, shubhranshu-sahu, Meghana-2124, Jai-76</b></sub>
+<!-- 
+If your name is not appearing in the contributors list above, please add it here manually. 
+-->
+<sub><b>All contributors: Adez017, shubhranshu-sahu, Meghana-2124, Jai-76,Manar-Elhabbal7</b></sub>
+
 
 ## Contributing
 
