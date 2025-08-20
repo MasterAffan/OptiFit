@@ -2,5 +2,5 @@ Flask==2.3.2
 opencv-python-headless==4.9.0.80
 mediapipe==0.10.21
 numpy==1.26.4
-pyngrok==7.3.0
+
 
