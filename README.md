@@ -58,8 +58,6 @@ OptiFit is an innovative mobile application designed to revolutionize your worko
 
 ## 🎥 Demo
 
-## 🎥 Demo
-
 <p align="center">
   <a href="https://youtube.com/shorts/_uV-pqBFSZ8?si=DmzEoXbNnHxfGHNK" target="_blank">
     <img src="https://img.youtube.com/vi/_uV-pqBFSZ8/0.jpg" alt="OptiFit Demo Video" width="300">
