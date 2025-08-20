@@ -60,8 +60,19 @@ OptiFit is an innovative mobile application designed to revolutionize your worko
 
 <p align="center">
   <a href="https://youtube.com/shorts/_uV-pqBFSZ8?si=DmzEoXbNnHxfGHNK" target="_blank" style="text-decoration:none;">
-    <button style="padding: 12px 25px; background-color:#FF0000; color:white; border:none; border-radius:8px; font-size:18px; cursor:pointer;">
-      ▶ Watch Demo Video
+    <button style="
+      padding: 12px 30px;
+      background: linear-gradient(90deg, #FF416C, #FF4B2B);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+      transition: transform 0.2s;
+    " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+      ▶ Watch OptiFit Demo
     </button>
   </a>
 </p>
