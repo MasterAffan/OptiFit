@@ -59,12 +59,14 @@ OptiFit is an innovative mobile application designed to revolutionize your worko
 ## 🎥 Demo
 
 <p align="center">
-  <a href="https://youtube.com/shorts/_uV-pqBFSZ8?si=DmzEoXbNnHxfGHNK" target="_blank">
-    <img src="https://img.youtube.com/vi/_uV-pqBFSZ8/0.jpg" alt="OptiFit Demo Video" width="600">
+  <a href="https://youtube.com/shorts/_uV-pqBFSZ8?si=DmzEoXbNnHxfGHNK" target="_blank" style="text-decoration:none;">
+    <button style="padding: 12px 25px; background-color:#FF0000; color:white; border:none; border-radius:8px; font-size:18px; cursor:pointer;">
+      ▶ Watch Demo Video
+    </button>
   </a>
 </p>
 
-> Click the image above to watch the demo on YouTube.
+> Click the button above to watch the demo on YouTube.
 
 
 ---
