@@ -67,14 +67,14 @@ This repository is a monorepo containing both the frontend mobile application an
 ## 🎥 Demo
 
 <p align="center">
-  <a href="https://youtube.com/shorts/_uV-pqBFSZ8?si=DmzEoXbNnHxfGHNK" target="_blank">
-    <img src="https://img.youtube.com/vi/_uV-pqBFSZ8/0.jpg" alt="OptiFit Demo Video" width="600">
+  <a href="optifit app/assets/videos/demo.mp4">
+    <img src="optifit app/assets/applogo.png" alt="Click to watch demo video" width="600">
   </a>
 </p>
 
-> Click the image above to watch the demo on YouTube.
->
-> 
+> The demo video is included in the repository under `optifit app/assets/videos/demo.mp4`.  
+> Click the image above to open the video locally.
+
 ## Getting Started
 
 Ready to contribute? Follow our comprehensive setup guide to get both frontend and backend running:
