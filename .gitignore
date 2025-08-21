@@ -1,3 +1,9 @@
+# gemini-cli settings
+.gemini/
+
+# GitHub App credentials
+gha-creds-*.json
+
 # Environment variables
 .env
 .env.local
