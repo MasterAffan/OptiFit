@@ -96,7 +96,7 @@ jobs:
                 "run_shell_command(echo)"
               ],
               "telemetry": {
-                "enabled": false,
+                "enabled": true,
                 "target": "gcp"
               }
             }
