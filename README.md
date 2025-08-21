@@ -63,6 +63,18 @@ This repository is a monorepo containing both the frontend mobile application an
 - **`optifit backend/`**: The Python-based Flask server that handles video processing and AI analysis.
   - [**Backend README**](./optifit%20backend/README_BACKEND.md)
 
+
+## 🎥 Demo
+
+<p align="center">
+  <a href="optifit app/assets/videos/demo.mp4">
+    <img src="optifit app/assets/applogo.png" alt="Click to watch demo video" width="300">
+  </a>
+</p>
+
+> The demo video is included in the repository under `optifit app/assets/videos/demo.mp4`.  
+> Click the image above to open the video locally.
+
 ## Getting Started
 
 Ready to contribute? Follow our comprehensive setup guide to get both frontend and backend running:
@@ -82,7 +94,7 @@ A huge thank you to all the amazing contributors who have helped make OptiFit be
 <!-- 
 If your name is not appearing in the contributors list above, please add it here manually. 
 -->
-<sub><b>All contributors: Adez017, shubhranshu-sahu, Meghana-2124, Jai-76</b></sub>
+<sub><b>All contributors: Adez017, shubhranshu-sahu, Meghana-2124, Jai-76,Manar-Elhabbal7</b></sub>
 
 
 ## Contributing
