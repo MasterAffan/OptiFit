@@ -3,6 +3,7 @@ import '../theme/theme.dart';
 import '../services/data_service.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
+import '../utils/validators.dart';
 
 class PersonalInfoScreen extends StatefulWidget {
   const PersonalInfoScreen({super.key});
@@ -167,29 +168,26 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                     TextFormField(
                       controller: _nameController,
                       decoration: const InputDecoration(labelText: 'Name'),
-                      validator: (v) =>
-                          v == null || v.isEmpty ? 'Enter your name' : null,
+                      validator: (value) => Validators.validateNotEmpty(value, 'Name'),
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
                       controller: _emailController,
                       decoration: const InputDecoration(labelText: 'Email'),
                       keyboardType: TextInputType.emailAddress,
-                      validator: (v) =>
-                          v == null || v.isEmpty ? 'Enter your email' : null,
+                      validator: Validators.validateEmail,
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
                       controller: _ageController,
                       decoration: const InputDecoration(labelText: 'Age'),
                       keyboardType: TextInputType.number,
-                      validator: (v) {
-                        if (v == null || v.isEmpty) return 'Enter your age';
-                        final age = int.tryParse(v);
-                        if (age == null || age < 10 || age > 120)
-                          return 'Enter a valid age';
-                        return null;
-                      },
+                      validator: (value) => Validators.validateNumber(
+                        value, 
+                        'Age',
+                        min: 10,
+                        max: 120,
+                      ),
                     ),
                     const SizedBox(height: 16),
                     DropdownButtonFormField<String>(
