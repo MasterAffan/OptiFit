@@ -142,4 +142,17 @@ git push origin issue-42-fix-login-validation
 - **Issues:** Ask questions in the issue comments.
 - **Discussions:** Use GitHub Discussions for general queries.
 
+### Contributors
+
+Thanks to all the wonderful people who have contributed to this project!  
+
+[![Contributors](https://contrib.rocks/image?repo=MasterAffan/OptiFit)](https://github.com/MasterAffan/OptiFit/graphs/contributors)
+
+### Contributors Not Shown Above
+
+- [Jai-76](https://github.com/Jai-76)
+- [Meghana-2124](https://github.com/Meghana-2124)
+- [shubhranshu-sahu](https://github.com/shubhranshu-sahu)
+- [Adez017](https://github.com/Adez017)
+
 Thank you for contributing to OptiFit! Together, we can make fitness more accessible and effective for everyone.
