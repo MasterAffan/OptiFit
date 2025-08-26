@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/rendering.dart';
 import '../theme/theme.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'dart:io';
@@ -15,12 +16,16 @@ class AIChatScreen extends StatefulWidget {
 
   @override
   State<AIChatScreen> createState() => _AIChatScreenState();
+
+
 }
 
 class _AIChatScreenState extends State<AIChatScreen>
     with TickerProviderStateMixin {
   final List<_ChatMessage> _messages = [];
   final GlobalKey<AnimatedListState> _listKey = GlobalKey<AnimatedListState>();
+  final ScrollController _scrollController = ScrollController();
+  bool _shouldAutoScroll = true;
   bool _isUploading = false;
   String? _annotatedVideoUrl;
   bool _suggestionsVisible = true;
@@ -35,12 +40,26 @@ class _AIChatScreenState extends State<AIChatScreen>
 
   final TextEditingController _textController = TextEditingController();
 
+  void _scrollToBottom() {
+    if (!_shouldAutoScroll) return; // User is scrolling up, don't force scroll
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
+  }
+
   void _addMessage(_ChatMessage msg) {
     _messages.add(msg);
     _listKey.currentState?.insertItem(
       _messages.length - 1,
       duration: const Duration(milliseconds: 350),
     );
+    _scrollToBottom();
   }
 
   void _onSendMessage(String text) {
@@ -437,17 +456,31 @@ class _AIChatScreenState extends State<AIChatScreen>
             _buildUploadCard(),
             _buildSuggestions(),
             Expanded(
-              child: AnimatedList(
-                key: _listKey,
-                initialItemCount: _messages.length,
-                padding: const EdgeInsets.all(16),
-                itemBuilder: (context, index, animation) {
-                  final msg = _messages[index];
-                  return _AnimatedChatBubble(
-                    message: msg,
-                    animation: animation,
-                  );
+              child: NotificationListener<UserScrollNotification>(
+                onNotification: (notification){
+                  if((notification.direction == ScrollDirection.forward) ||
+                  (notification.direction == ScrollDirection.reverse)){
+                      if (_scrollController.hasClients) {
+                        final atBottom = _scrollController.offset >=
+                            _scrollController.position.maxScrollExtent - 50;
+                        _shouldAutoScroll = atBottom;
+                      }
+                  }
+                  return false;
                 },
+                child: AnimatedList(
+                  key: _listKey,
+                  controller: _scrollController,
+                  initialItemCount: _messages.length,
+                  padding: const EdgeInsets.all(16),
+                  itemBuilder: (context, index, animation) {
+                    final msg = _messages[index];
+                    return _AnimatedChatBubble(
+                      message: msg,
+                      animation: animation,
+                    );
+                  },
+                ),
               ),
             ),
             Padding(
