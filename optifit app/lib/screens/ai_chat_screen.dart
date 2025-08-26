@@ -40,6 +40,7 @@ class _AIChatScreenState extends State<AIChatScreen>
 
   final TextEditingController _textController = TextEditingController();
 
+  //  Auto-scroll only if user is at bottom
   void _scrollToBottom() {
     if (!_shouldAutoScroll) return; // User is scrolling up, don't force scroll
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -456,17 +457,22 @@ class _AIChatScreenState extends State<AIChatScreen>
             _buildUploadCard(),
             _buildSuggestions(),
             Expanded(
-              child: NotificationListener<UserScrollNotification>(
+              //  Listen to user's scroll to detect if they are manually scrolling
+
+            child: NotificationListener<UserScrollNotification>(
                 onNotification: (notification){
+                  // If user scrolls forward (up) or reverse (down)
                   if((notification.direction == ScrollDirection.forward) ||
                   (notification.direction == ScrollDirection.reverse)){
+                    //  Check if user is still at the bottom
                       if (_scrollController.hasClients) {
                         final atBottom = _scrollController.offset >=
                             _scrollController.position.maxScrollExtent - 50;
+                        // If at bottom → allow auto-scroll, else pause auto-scroll
                         _shouldAutoScroll = atBottom;
                       }
                   }
-                  return false;
+                  return false; // Don't stop the scroll event from propagating
                 },
                 child: AnimatedList(
                   key: _listKey,
