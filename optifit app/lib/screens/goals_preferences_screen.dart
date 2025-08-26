@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../theme/theme.dart';
 import '../services/data_service.dart';
+import '../utils/validators.dart';
 
 class GoalsPreferencesScreen extends StatefulWidget {
   const GoalsPreferencesScreen({super.key});
@@ -81,24 +82,24 @@ class _GoalsPreferencesScreenState extends State<GoalsPreferencesScreen> {
                       controller: _workoutsPerWeekController,
                       decoration: const InputDecoration(labelText: 'Workouts per week'),
                       keyboardType: TextInputType.number,
-                      validator: (v) {
-                        if (v == null || v.isEmpty) return 'Enter a number';
-                        final n = int.tryParse(v);
-                        if (n == null || n < 1 || n > 14) return 'Enter a valid number (1-14)';
-                        return null;
-                      },
+                      validator: (value) => Validators.validateNumber(
+                        value,
+                        'Workouts per week',
+                        min: 1,
+                        max: 14,
+                      ),
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
                       controller: _targetWeightController,
                       decoration: const InputDecoration(labelText: 'Target Weight (kg)'),
                       keyboardType: TextInputType.number,
-                      validator: (v) {
-                        if (v == null || v.isEmpty) return 'Enter a target weight';
-                        final w = double.tryParse(v);
-                        if (w == null || w < 30 || w > 300) return 'Enter a valid weight';
-                        return null;
-                      },
+                      validator: (value) => Validators.validateNumber(
+                        value, 
+                        'Target weight',
+                        min: 30,
+                        max: 300,
+                      ),
                     ),
                     const SizedBox(height: 16),
                     Text('Preferred Workout Types', style: Theme.of(context).textTheme.bodyLarge),
