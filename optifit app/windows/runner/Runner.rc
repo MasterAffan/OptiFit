@@ -52,7 +52,11 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
+<<<<<<< HEAD
 IDI_APP_ICON            ICON                    "resources\\app_icon2.ico"
+=======
+IDI_APP_ICON            ICON                    "resources\\applogo.ico"
+>>>>>>> f52995d (second commit)
 
 
 /////////////////////////////////////////////////////////////////////////////
