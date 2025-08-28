@@ -452,12 +452,13 @@ class _StartWorkoutScreenState extends State<StartWorkoutScreen> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(
-                            '${selectedWorkout!.exercises.length} exercises',
+                            '${selectedWorkout!.exercises.length} exercise',
                             style: TextStyle(
                               color: AppTheme.primary,
                               fontWeight: FontWeight.w600,
-                              fontSize: 14,
+                              fontSize: 12,
                             ),
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ],
@@ -630,15 +631,16 @@ class _WorkoutOption extends StatelessWidget {
                             children: [
                               Icon(
                                 Icons.fitness_center,
-                                size: 16,
+                                size: 14,
                                 color: AppTheme.textSecondary,
                               ),
-                              const SizedBox(width: 4),
+                              const SizedBox(width: 2),
                               Text(
                                 '${workout.exercises.length} exercises',
                                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                       color: AppTheme.textSecondary,
                                     ),
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ],
                           ),
@@ -724,7 +726,7 @@ class _ExerciseItem extends StatelessWidget {
       child: Row(
         children: [
           Container(
-            width: 32,
+            width: 34,
             height: 32,
             decoration: BoxDecoration(
               color: AppTheme.primary.withOpacity(0.1),
@@ -736,7 +738,7 @@ class _ExerciseItem extends StatelessWidget {
                 style: TextStyle(
                   color: AppTheme.primary,
                   fontWeight: FontWeight.w700,
-                  fontSize: 14,
+                  fontSize: 12,
                 ),
               ),
             ),
@@ -757,10 +759,11 @@ class _ExerciseItem extends StatelessWidget {
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                         fontWeight: FontWeight.w600,
                       ),
+                  overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 4),
                 Wrap(
-                  spacing: 16,
+                  spacing: 18,
                   runSpacing: 4,
                   children: [
                     Text(
@@ -818,7 +821,7 @@ class _SummaryItem extends StatelessWidget {
           Icon(
             icon,
             color: AppTheme.primary,
-            size: 20,
+            size: 19,
           ),
           const SizedBox(width: 8),
           Column(
