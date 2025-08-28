@@ -372,7 +372,7 @@ class _AIChatScreenState extends State<AIChatScreen>
             padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
             child: Row(
               children: [
-                Icon(Icons.smart_toy, color: AppTheme.primary, size: 36),
+                Icon(Icons.smart_toy, color: AppTheme.primary, size: 32),
                 const SizedBox(width: 16),
                 Expanded(
                   child: Column(
@@ -385,7 +385,7 @@ class _AIChatScreenState extends State<AIChatScreen>
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Let the AI analyze your form and give feedback!',
+                        'Let the AI analyze your form',
                         style: Theme.of(context).textTheme.bodyMedium,
                       ),
                     ],
@@ -421,10 +421,10 @@ class _AIChatScreenState extends State<AIChatScreen>
     if (!_suggestionsVisible || _messages.isNotEmpty)
       return const SizedBox.shrink();
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
       child: Wrap(
-        spacing: 8,
-        runSpacing: 8,
+        spacing: 4,
+        runSpacing: 4,
         children: _suggestions
             .map(
               (s) => ActionChip(

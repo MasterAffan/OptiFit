@@ -38,142 +38,144 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppTheme.background,
-      body: RefreshIndicator(
-        onRefresh: () async {
-          setState(() {});
-        },
-        child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          child: Padding(
-            padding: AppTheme.paddingLG,
-            child: FutureBuilder<Map<String, dynamic>>(
-              future: _futureStats,
-              builder: (context, snapshot) {
-                if (!snapshot.hasData) {
-                  return SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.7,
-                    child: const Center(child: CircularProgressIndicator()),
-                  );
-                }
-                final stats = snapshot.data!;
-                final totalCalories = stats['totalCalories'] ?? 0;
-                final totalWorkouts = stats['totalWorkouts'] ?? 0;
-                final totalMinutes = stats['totalDuration'] ?? 0;
-                final streakDays = stats['streakDays'] ?? 0;
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Header with navigation buttons
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Welcome back!',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .headlineMedium
-                                    ?.copyWith(fontWeight: FontWeight.w700),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                'Ready for your next workout?',
-                                style: Theme.of(context).textTheme.bodyMedium
-                                    ?.copyWith(color: AppTheme.textSecondary),
-                              ),
-                            ],
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: AppTheme.background,
+        body: RefreshIndicator(
+          onRefresh: () async {
+            setState(() {});
+          },
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: Padding(
+              padding: AppTheme.paddingLG,
+              child: FutureBuilder<Map<String, dynamic>>(
+                future: _futureStats,
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) {
+                    return SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.7,
+                      child: const Center(child: CircularProgressIndicator()),
+                    );
+                  }
+                  final stats = snapshot.data!;
+                  final totalCalories = stats['totalCalories'] ?? 0;
+                  final totalWorkouts = stats['totalWorkouts'] ?? 0;
+                  final totalMinutes = stats['totalDuration'] ?? 0;
+                  final streakDays = stats['streakDays'] ?? 0;
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Header with navigation buttons
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Welcome back!',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headlineMedium
+                                      ?.copyWith(fontWeight: FontWeight.w700),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  'Ready for your next workout?',
+                                  style: Theme.of(context).textTheme.bodyMedium
+                                      ?.copyWith(color: AppTheme.textSecondary),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                        IconButton(
+                          IconButton(
+                            onPressed: () async {
+                              final result = await Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const StartWorkoutScreen(),
+                                ),
+                              );
+                              if (result == true) {
+                                _refreshStatsAndInsight();
+                              }
+                            },
+                            icon: const Icon(Icons.fitness_center),
+                            style: IconButton.styleFrom(
+                              backgroundColor: AppTheme.primary,
+                              foregroundColor: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          IconButton(
+                            onPressed: () async {
+                              await Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => const ScheduleScreen(),
+                                ),
+                              );
+                            },
+                            icon: const Icon(Icons.schedule),
+                            style: IconButton.styleFrom(
+                              backgroundColor: AppTheme.surface,
+                              foregroundColor: AppTheme.primary,
+                              side: BorderSide(color: AppTheme.primary),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 32),
+      
+                      // Header section with greeting and profile
+                      _buildHeader(),
+      
+                      const SizedBox(height: AppTheme.spacingXL),
+      
+                      // AI Insight Card
+                      _buildAIInsightCard(),
+      
+                      const SizedBox(height: AppTheme.spacingXL),
+      
+                      // Today's Progress Stats
+                      _buildStatsSection(
+                        totalCalories: totalCalories,
+                        totalWorkouts: totalWorkouts,
+                        totalMinutes: totalMinutes,
+                        streakDays: streakDays,
+                      ),
+      
+                      const SizedBox(height: AppTheme.spacingXL),
+      
+                      // Quick Actions
+                      _buildQuickActionsSection(context),
+      
+                      const SizedBox(height: AppTheme.spacingXXL),
+      
+                      // Add navigation to workouts screen with refresh
+                      Padding(
+                        padding: const EdgeInsets.only(top: 16.0),
+                        child: AppButton(
+                          text: 'View Workout History',
+                          icon: Icons.history,
                           onPressed: () async {
                             final result = await Navigator.of(context).push(
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    const StartWorkoutScreen(),
+                                builder: (context) => WorkoutsScreen(),
                               ),
                             );
                             if (result == true) {
                               _refreshStatsAndInsight();
                             }
                           },
-                          icon: const Icon(Icons.fitness_center),
-                          style: IconButton.styleFrom(
-                            backgroundColor: AppTheme.primary,
-                            foregroundColor: Colors.white,
-                          ),
+                          isFullWidth: true,
+                          variant: AppButtonVariant.secondary,
                         ),
-                        const SizedBox(width: 8),
-                        IconButton(
-                          onPressed: () async {
-                            await Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => const ScheduleScreen(),
-                              ),
-                            );
-                          },
-                          icon: const Icon(Icons.schedule),
-                          style: IconButton.styleFrom(
-                            backgroundColor: AppTheme.surface,
-                            foregroundColor: AppTheme.primary,
-                            side: BorderSide(color: AppTheme.primary),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 32),
-
-                    // Header section with greeting and profile
-                    _buildHeader(),
-
-                    const SizedBox(height: AppTheme.spacingXL),
-
-                    // AI Insight Card
-                    _buildAIInsightCard(),
-
-                    const SizedBox(height: AppTheme.spacingXL),
-
-                    // Today's Progress Stats
-                    _buildStatsSection(
-                      totalCalories: totalCalories,
-                      totalWorkouts: totalWorkouts,
-                      totalMinutes: totalMinutes,
-                      streakDays: streakDays,
-                    ),
-
-                    const SizedBox(height: AppTheme.spacingXL),
-
-                    // Quick Actions
-                    _buildQuickActionsSection(context),
-
-                    const SizedBox(height: AppTheme.spacingXXL),
-
-                    // Add navigation to workouts screen with refresh
-                    Padding(
-                      padding: const EdgeInsets.only(top: 16.0),
-                      child: AppButton(
-                        text: 'View Workout History',
-                        icon: Icons.history,
-                        onPressed: () async {
-                          final result = await Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => WorkoutsScreen(),
-                            ),
-                          );
-                          if (result == true) {
-                            _refreshStatsAndInsight();
-                          }
-                        },
-                        isFullWidth: true,
-                        variant: AppButtonVariant.secondary,
                       ),
-                    ),
-                  ],
-                );
-              },
+                    ],
+                  );
+                },
+              ),
             ),
           ),
         ),
@@ -434,7 +436,7 @@ Widget _buildStatsSection({
         crossAxisCount: 2,
         crossAxisSpacing: AppTheme.spacingM,
         mainAxisSpacing: AppTheme.spacingM,
-        childAspectRatio: 1.2,
+        childAspectRatio: 1.0,
         children: [
           _buildStatCard(
             icon: Icons.local_fire_department,
