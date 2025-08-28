@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../services/custom_workout_service.dart';
 import '../theme/theme.dart';
 import '../widgets/app_button.dart';
 import '../models/workout_models.dart';
@@ -13,8 +14,23 @@ class StartWorkoutScreen extends StatefulWidget {
 
 class _StartWorkoutScreenState extends State<StartWorkoutScreen> {
   WorkoutPlan? selectedWorkout;
-  
-  final List<WorkoutPlan> workouts = [
+  List<WorkoutPlan> _allWorkouts = [];
+  final CustomWorkoutService _customWorkoutService = CustomWorkoutService();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadWorkouts();
+  }
+
+  Future<void> _loadWorkouts() async {
+    final customWorkouts = await _customWorkoutService.getCustomWorkouts();
+    setState(() {
+      _allWorkouts = [...predefinedWorkouts, ...customWorkouts];
+    });
+  }
+
+  final List<WorkoutPlan> predefinedWorkouts = [
     WorkoutPlan(
       name: 'Upper Body Strength',
       duration: '45 min',
@@ -376,16 +392,16 @@ class _StartWorkoutScreenState extends State<StartWorkoutScreen> {
             // Header
             Text(
               'Choose Your Workout',
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 8),
             Text(
               'Select a workout plan to get started',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppTheme.textSecondary,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: AppTheme.textSecondary),
             ),
             const SizedBox(height: 24),
 
@@ -404,19 +420,21 @@ class _StartWorkoutScreenState extends State<StartWorkoutScreen> {
                   Text(
                     'Available Workouts',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.w700,
-                        ),
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                   const SizedBox(height: 16),
-                  ...workouts.map((workout) => _WorkoutOption(
-                        workout: workout,
-                        isSelected: selectedWorkout?.name == workout.name,
-                        onTap: () {
-                          setState(() {
-                            selectedWorkout = workout;
-                          });
-                        },
-                      )),
+                  ..._allWorkouts.map(
+                    (workout) => _WorkoutOption(
+                      workout: workout,
+                      isSelected: selectedWorkout?.name == workout.name,
+                      onTap: () {
+                        setState(() {
+                          selectedWorkout = workout;
+                        });
+                      },
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -440,13 +458,15 @@ class _StartWorkoutScreenState extends State<StartWorkoutScreen> {
                         Expanded(
                           child: Text(
                             'Exercise List',
-                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                  fontWeight: FontWeight.w700,
-                                ),
+                            style: Theme.of(context).textTheme.titleLarge
+                                ?.copyWith(fontWeight: FontWeight.w700),
                           ),
                         ),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
                           decoration: BoxDecoration(
                             color: AppTheme.primary.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(12),
@@ -491,8 +511,8 @@ class _StartWorkoutScreenState extends State<StartWorkoutScreen> {
                     Text(
                       'Workout Summary',
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.w700,
-                          ),
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                     const SizedBox(height: 16),
                     Wrap(
@@ -528,9 +548,8 @@ class _StartWorkoutScreenState extends State<StartWorkoutScreen> {
                 onPressed: () {
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (context) => WorkoutExecutionScreen(
-                        workoutPlan: selectedWorkout!,
-                      ),
+                      builder: (context) =>
+                          WorkoutExecutionScreen(workoutPlan: selectedWorkout!),
                     ),
                   );
                 },
@@ -566,7 +585,9 @@ class _WorkoutOption extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 12),
         padding: AppTheme.cardPadding,
         decoration: BoxDecoration(
-          color: isSelected ? AppTheme.primary.withOpacity(0.1) : AppTheme.surface,
+          color: isSelected
+              ? AppTheme.primary.withOpacity(0.1)
+              : AppTheme.surface,
           borderRadius: BorderRadius.circular(AppTheme.cardRadius),
           border: Border.all(
             color: isSelected ? AppTheme.primary : AppTheme.divider,
@@ -586,11 +607,7 @@ class _WorkoutOption extends StatelessWidget {
                     color: workout.color.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Icon(
-                    workout.icon,
-                    color: workout.color,
-                    size: 24,
-                  ),
+                  child: Icon(workout.icon, color: workout.color, size: 24),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
@@ -599,9 +616,8 @@ class _WorkoutOption extends StatelessWidget {
                     children: [
                       Text(
                         workout.name,
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.w600,
-                            ),
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.w600),
                       ),
                       const SizedBox(height: 4),
                       Wrap(
@@ -619,9 +635,8 @@ class _WorkoutOption extends StatelessWidget {
                               const SizedBox(width: 4),
                               Text(
                                 workout.duration,
-                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      color: AppTheme.textSecondary,
-                                    ),
+                                style: Theme.of(context).textTheme.bodySmall
+                                    ?.copyWith(color: AppTheme.textSecondary),
                               ),
                             ],
                           ),
@@ -636,9 +651,8 @@ class _WorkoutOption extends StatelessWidget {
                               const SizedBox(width: 4),
                               Text(
                                 '${workout.exercises.length} exercises',
-                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      color: AppTheme.textSecondary,
-                                    ),
+                                style: Theme.of(context).textTheme.bodySmall
+                                    ?.copyWith(color: AppTheme.textSecondary),
                               ),
                             ],
                           ),
@@ -653,9 +667,8 @@ class _WorkoutOption extends StatelessWidget {
                               const SizedBox(width: 4),
                               Text(
                                 '$estimatedCalories cal',
-                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  color: AppTheme.textSecondary,
-                                ),
+                                style: Theme.of(context).textTheme.bodySmall
+                                    ?.copyWith(color: AppTheme.textSecondary),
                               ),
                             ],
                           ),
@@ -666,9 +679,14 @@ class _WorkoutOption extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 3,
+                  ),
                   decoration: BoxDecoration(
-                    color: _getDifficultyColor(workout.difficulty).withOpacity(0.1),
+                    color: _getDifficultyColor(
+                      workout.difficulty,
+                    ).withOpacity(0.1),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
@@ -706,10 +724,7 @@ class _ExerciseItem extends StatelessWidget {
   final Exercise exercise;
   final int index;
 
-  const _ExerciseItem({
-    required this.exercise,
-    required this.index,
-  });
+  const _ExerciseItem({required this.exercise, required this.index});
 
   @override
   Widget build(BuildContext context) {
@@ -742,11 +757,7 @@ class _ExerciseItem extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 12),
-          Icon(
-            exercise.icon,
-            color: AppTheme.textSecondary,
-            size: 20,
-          ),
+          Icon(exercise.icon, color: AppTheme.textSecondary, size: 20),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -754,9 +765,9 @@ class _ExerciseItem extends StatelessWidget {
               children: [
                 Text(
                   exercise.name,
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 4),
                 Wrap(
@@ -766,31 +777,27 @@ class _ExerciseItem extends StatelessWidget {
                     Text(
                       '${exercise.sets} sets',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppTheme.textSecondary,
-                          ),
+                        color: AppTheme.textSecondary,
+                      ),
                     ),
                     Text(
                       '${exercise.reps} reps',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppTheme.textSecondary,
-                          ),
+                        color: AppTheme.textSecondary,
+                      ),
                     ),
                     Text(
                       '${exercise.rest} rest',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppTheme.textSecondary,
-                          ),
+                        color: AppTheme.textSecondary,
+                      ),
                     ),
                   ],
                 ),
               ],
             ),
           ),
-          Icon(
-            Icons.chevron_right,
-            color: AppTheme.textSubtle,
-            size: 20,
-          ),
+          Icon(Icons.chevron_right, color: AppTheme.textSubtle, size: 20),
         ],
       ),
     );
@@ -815,26 +822,22 @@ class _SummaryItem extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            icon,
-            color: AppTheme.primary,
-            size: 20,
-          ),
+          Icon(icon, color: AppTheme.primary, size: 20),
           const SizedBox(width: 8),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 value,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
               ),
               Text(
                 label,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppTheme.textSecondary,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodySmall?.copyWith(color: AppTheme.textSecondary),
               ),
             ],
           ),
@@ -842,4 +845,4 @@ class _SummaryItem extends StatelessWidget {
       ),
     );
   }
-} 
+}
