@@ -222,6 +222,7 @@ class WorkoutPlan {
   final IconData icon;
   final Color color;
   final List<Exercise> exercises;
+  final String? calories;
 
   WorkoutPlan({
     required this.name,
@@ -231,7 +232,22 @@ class WorkoutPlan {
     required this.icon,
     required this.color,
     required this.exercises,
+    this.calories,
   });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'name': name,
+      'duration': duration,
+      'exercises': exerciseCount,
+      'difficulty': difficulty,
+      'icon': icon,
+      'color': color,
+      'calories': calories ?? 'N/A',
+      'rating': 0.0, // Custom workouts don't have ratings yet
+      'category': 'Custom',
+    };
+  }
 
   Map<String, dynamic> toJson() {
     return {
@@ -242,6 +258,7 @@ class WorkoutPlan {
       'icon': icon.codePoint,
       'color': color.value,
       'exercises': exercises.map((exercise) => exercise.toJson()).toList(),
+      'calories': calories,
     };
   }
 
@@ -256,6 +273,7 @@ class WorkoutPlan {
       exercises: (json['exercises'] as List)
           .map((exercise) => Exercise.fromJson(exercise))
           .toList(),
+      calories: json['calories'],
     );
   }
 }
