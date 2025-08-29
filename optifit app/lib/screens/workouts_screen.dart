@@ -894,7 +894,7 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
                       icon: const Icon(Icons.add_circle_outline),
                       label: const Text('Create New'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme.secondary,
+                        backgroundColor: AppTheme.primary,
                         foregroundColor: Colors.white,
                         textStyle: const TextStyle(fontWeight: FontWeight.w600),
                         minimumSize: const Size(0, 40),
