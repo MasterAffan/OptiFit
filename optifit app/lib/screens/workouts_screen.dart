@@ -10,7 +10,8 @@ import 'start_workout_screen.dart';
 import '../services/data_service.dart';
 
 class WorkoutsScreen extends StatefulWidget {
-  const WorkoutsScreen({super.key});
+  final VoidCallback? onGoHome;
+  const WorkoutsScreen({super.key, this.onGoHome});
 
   @override
   State<WorkoutsScreen> createState() => _WorkoutsScreenState();
@@ -610,7 +611,7 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: widget.onGoHome,
         ),
       ),
       body: SafeArea(
