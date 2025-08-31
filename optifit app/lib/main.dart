@@ -46,12 +46,18 @@ class _MainScaffoldState extends State<MainScaffold> {
     _screens[_selectedIndex] = _buildScreen(_selectedIndex);
   }
 
+  void _changeTab(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
   Widget _buildScreen(int index) {
     switch (index) {
       case 0:
         return const HomeScreen();
       case 1:
-        return const WorkoutsScreen();
+        return WorkoutsScreen(onGoHome: () => _changeTab(0));
       case 2:
         return const AIChatScreen();
       case 3:
@@ -79,11 +85,7 @@ class _MainScaffoldState extends State<MainScaffold> {
       ),
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: _selectedIndex,
-        onTap: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
+        onTap: _changeTab,
       ),
     );
   }
