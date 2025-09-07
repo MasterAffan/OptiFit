@@ -1,3 +1,5 @@
+import 'package:OptiFit/screens/schedule_screen.dart';
+import 'package:OptiFit/services/notification_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'theme/theme.dart';
@@ -7,8 +9,21 @@ import 'screens/ai_chat_screen.dart';
 import 'screens/progress_screen.dart';
 import 'screens/profile_screen.dart';
 import 'widgets/custom_bottom_nav_bar.dart';
+import 'package:timezone/data/latest_all.dart' as tz;
+
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 Future main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  tz.initializeTimeZones();
+
+  // Initialize notification service
+  try {
+    await NotificationService().initialize();
+    print('✅ Notification service initialized successfully');
+  } catch (e) {
+    print('❌ Failed to initialize notification service: $e');
+  }
   await dotenv.load(fileName: ".env");
   runApp(const MyApp());
 }
@@ -19,17 +34,23 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: navigatorKey,
       title: 'OptiFit',
       theme: AppTheme.lightTheme,
       home: const MainScaffold(),
       debugShowCheckedModeBanner: false,
+      routes: {
+        //'/': (context) => const MainScaffold(),
+        ScheduleScreen.routeName: (context) => ScheduleScreen(notificationData: ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>?),
+      },
     );
   }
 }
 
 class MainScaffold extends StatefulWidget {
   final int initialIndex;
-  const MainScaffold({super.key, this.initialIndex = 0});
+  final Map<String, dynamic>? notificationData;
+  const MainScaffold({super.key, this.initialIndex = 0, this.notificationData});
 
   @override
   State<MainScaffold> createState() => _MainScaffoldState();
