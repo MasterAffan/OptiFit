@@ -1,15 +1,20 @@
+import 'dart:async';
+
+import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:permission_handler/permission_handler.dart';
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
 import 'dart:io';
 
 import '../main.dart';
 import '../screens/schedule_screen.dart';
 
+final StreamController<Map<String, dynamic>> notificationPayloadStream = StreamController.broadcast();
+
 class NotificationService {
+  static const MethodChannel _channel = MethodChannel('optifit/notification');
   static final NotificationService _instance = NotificationService._internal();
   factory NotificationService() => _instance;
   NotificationService._internal();
@@ -20,6 +25,27 @@ class NotificationService {
   static const String _workoutChannelId = 'workout_reminders';
   static const String _workoutChannelName = 'Workout Reminders';
   static const String _workoutChannelDescription = 'Notifications for scheduled workouts';
+
+  // Initialize this in your startup after plugin init
+  static void initializePlatformCallbacks() {
+    _channel.setMethodCallHandler((call) async {
+      print('DEBUG: MethodChannel received method: ${call.method} with arguments: ${call.arguments}');
+      if (call.method == 'onNotificationClick') {
+        final String? payload = call.arguments as String?;
+        print('DEBUG: Dart received notification payload: $payload');
+        if (payload != null) {
+          print('DEBUG: Notifying Dart about notification payload: $payload');
+          final data = jsonDecode(payload);
+          notificationPayloadStream.add(data);
+          NotificationHandler.notifyPayload(data);
+        }
+      }
+    });
+  }
+
+  static Future<void> onNotificationReceived(String payload) async {
+    await _channel.invokeMethod('onNotificationClick', payload);
+  }
 
   Future<void> initialize() async {
     print('🔧 Initializing notification service...');
@@ -54,6 +80,7 @@ class NotificationService {
 
     // Create notification channel for Android
     await _createNotificationChannel();
+    initializePlatformCallbacks();
 
     print('✅ Notification service initialization complete');
   }
@@ -82,13 +109,11 @@ class NotificationService {
   static void _onNotificationTapped(NotificationResponse response) {
     print('🔔 Notification tapped: ${response.payload}');
     if (response.payload == null) return;
-       final data = json.decode(response.payload!);
-
-       // Push named route via global navigatorKey
-       navigatorKey.currentState?.pushNamed(
-         ScheduleScreen.routeName,
-         arguments: data,
-       );
+    final data = json.decode(response.payload!);
+    navigatorKey.currentState?.pushNamed(
+      ScheduleScreen.routeName,
+    );
+    notificationPayloadStream.add(data);
   }
 
   Future<bool> requestPermissions() async {
@@ -152,25 +177,6 @@ class NotificationService {
 
     final tz.TZDateTime scheduledTZ = tz.TZDateTime.from(scheduledTime, tz.local);
     print('🌍 Scheduled time in timezone: $scheduledTZ');
-
-    // For testing: Schedule a notification 1 minute from now
-    if (kDebugMode) {
-      final testTime = tz.TZDateTime.now(tz.local).add(const Duration(minutes: 1));
-      await _scheduleNotification(
-        id: 99999, // Test ID
-        title: 'Test Notification',
-        body: 'This is a test notification for $workoutName! 🧪',
-        scheduledTime: testTime,
-        payload: json.encode({
-          'type': 'workout_reminder',
-          'workoutName': workoutName,
-          'dateKey': dateKey,
-          'workoutIndex': workoutIndex,
-          'minutesBefore': 0,
-        }),
-      );
-      print('🧪 Test notification scheduled for: $testTime');
-    }
 
     // Schedule 30 minutes before
     final thirtyMinBefore = scheduledTZ.subtract(const Duration(minutes: 30));
@@ -352,5 +358,15 @@ class NotificationNavigationHandler {
   static void handleNotificationTap(Map<String, dynamic> data) {
     print('📱 Handling notification tap: $data');
     _onNotificationTapped?.call(data);
+  }
+}
+
+class NotificationHandler {
+  static Function(Map<String, dynamic>)? onPayload;
+
+  static void notifyPayload(Map<String, dynamic> data) {
+    if (onPayload != null) {
+      onPayload!(data);
+    }
   }
 }
