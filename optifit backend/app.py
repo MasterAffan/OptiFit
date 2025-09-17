@@ -14,8 +14,12 @@ import time
 from werkzeug.utils import secure_filename
 from squat_counter import process_squat_video  # Import the actual processing logic
 from validation import *
+import logging
 
 app = Flask(__name__)
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 UPLOAD_FOLDER = 'uploads'
 PROCESSED_FOLDER = 'processed'
@@ -106,6 +110,7 @@ def upload_video():
         return jsonify(response_data)
     
     except APIError as e:
+        logger.error(f"API Error in {request.endpoint}: {e.message}", exc_info=True)
         return error_response(e.message, e.status_code)
     
 
@@ -125,6 +130,7 @@ def get_result(job_id):
             return jsonify({"status": "done", "result": job["result"]})
         
     except APIError as e:
+        logger.error(f"API Error in {request.endpoint}: {e.message}", exc_info=True)
         return error_response(e.message, e.status_code)
 
 # New endpoint to serve processed videos by filename
