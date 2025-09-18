@@ -5,6 +5,7 @@ except AttributeError:
     pass
 else:
     ssl._create_default_https_context = _create_unverified_https_context
+
 from flask import Flask, request, send_file, jsonify, url_for
 import os
 import threading
@@ -12,13 +13,29 @@ import uuid
 import time
 from werkzeug.utils import secure_filename
 from squat_counter import process_squat_video  # Import the actual processing logic
+from validation import *
+import logging
 
 app = Flask(__name__)
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 UPLOAD_FOLDER = 'uploads'
 PROCESSED_FOLDER = 'processed'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(PROCESSED_FOLDER, exist_ok=True)
+
+
+# Creates standardised error response 
+def error_response(message, status_code):
+    return jsonify({
+        "success": False,
+        "error": True,
+        "message": message,
+        "status_code": status_code,
+        "timestamp": int(time.time())
+    }), status_code
 
 # In-memory job store: {job_id: {"status": "processing"/"done", "result": {...}}}
 jobs = {}
@@ -40,7 +57,7 @@ def process_video_async(job_id, input_path, output_path, video_url):
         jobs[job_id]["error"] = str(e)
         print(f"Error in background processing: {e}")
 
-
+#Route to home
 @app.route('/', methods=['GET'])
 def home():
     base_info = {
@@ -51,57 +68,70 @@ def home():
             "/result/<job_id>": "GET - Check processing status and get results"
         }
     }
-    
-    return base_info, 200
 
+    return jsonify(base_info), 200  
+
+#Route to ping the server
 @app.route('/ping', methods=['GET'])
 def ping():
-    return {"message": "Server is live!"}, 200
+    return jsonify({"message": "Server is live!"}), 200
 
+#Route to get upload the video
 @app.route('/upload', methods=['POST'])
 def upload_video():
-    if 'video' not in request.files:
-        return {'error': 'No video file part'}, 400
+    try:
+        video = validate_upload_request(request)
+        validate_video_file(video)
 
-    video = request.files['video']
-    filename = secure_filename(video.filename)
-    input_path = os.path.join(UPLOAD_FOLDER, filename)
-    output_path = os.path.join(PROCESSED_FOLDER, f"processed_{filename}")
+        filename = secure_filename(video.filename)
+        input_path = os.path.join(UPLOAD_FOLDER, filename)
+        output_path = os.path.join(PROCESSED_FOLDER, f"processed_{filename}")
+        
+        # Save uploaded video
+        video.save(input_path)
+        
+        # Generate video URL
+        video_url = url_for('get_processed_video', filename=f"processed_{filename}", _external=True)
+        
+        # Create job
+        job_id = str(uuid.uuid4())
+        jobs[job_id] = {"status": "processing"}
+        
+        # Start background processing with pre-generated URL
+        threading.Thread(target=process_video_async, args=(job_id, input_path, output_path, video_url)).start()
+        
+        response_data = {
+            "status": "processing",
+            "job_id": job_id,
+            "message": "Video uploaded successfully. Processing started.",
+            "video_url": video_url
+        }
+        
+        return jsonify(response_data)
     
-    # Save uploaded video
-    video.save(input_path)
+    except APIError as e:
+        logger.error(f"API Error in {request.endpoint}: {e.message}", exc_info=True)
+        return error_response(e.message, e.status_code)
     
-    # Generate video URL
-    video_url = url_for('get_processed_video', filename=f"processed_{filename}", _external=True)
-    
-    # Create job
-    job_id = str(uuid.uuid4())
-    jobs[job_id] = {"status": "processing"}
-    
-    # Start background processing with pre-generated URL
-    threading.Thread(target=process_video_async, args=(job_id, input_path, output_path, video_url)).start()
-    
-    response_data = {
-        "status": "processing",
-        "job_id": job_id,
-        "message": "Video uploaded successfully. Processing started.",
-        "video_url": video_url
-    }
-    
-    return jsonify(response_data)
 
+
+# Route to get the result of the job with the job id
 @app.route('/result/<job_id>', methods=['GET'])
 def get_result(job_id):
-    job = jobs.get(job_id)
-    if not job:
-        return jsonify({"status": "not_found", "error": "Job not found"}), 404
-    
-    if job["status"] == "processing":
-        return jsonify({"status": "processing", "message": "Video is being processed..."})
-    elif job["status"] == "error":
-        return jsonify({"status": "error", "error": job.get("error", "Unknown error")}), 500
-    else:
-        return jsonify({"status": "done", "result": job["result"]})
+    try:
+        validate_job_request(job_id,jobs)
+
+        job = jobs.get(job_id)
+        if job["status"] == "processing":
+            return jsonify({"status": "processing", "message": "Video is being processed..."})
+        elif job["status"] == "error":
+            raise InternalServerError("Unknown Error")
+        else:
+            return jsonify({"status": "done", "result": job["result"]})
+        
+    except APIError as e:
+        logger.error(f"API Error in {request.endpoint}: {e.message}", exc_info=True)
+        return error_response(e.message, e.status_code)
 
 # New endpoint to serve processed videos by filename
 @app.route('/processed/<filename>')
