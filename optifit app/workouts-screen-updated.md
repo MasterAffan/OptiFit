@@ -1,3 +1,6 @@
+# Updated Workouts Screen with Pull-to-Refresh
+
+```dart
 import 'package:flutter/material.dart';
 import 'create_workout_screen.dart';
 import '../services/custom_workout_service.dart';
@@ -134,11 +137,11 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
     return selectedCategory == 0
         ? allWorkouts
         : allWorkouts
-        .where(
-          (workout) =>
-      workout['category'] == categories[selectedCategory],
-    )
-        .toList();
+            .where(
+              (workout) =>
+                  workout['category'] == categories[selectedCategory],
+            )
+            .toList();
   }
 
   // Get the corresponding WorkoutPlan for a workout card
@@ -160,7 +163,7 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
               rest: '60s',
               icon: Icons.fitness_center,
               instructions:
-              'Keep your body in a straight line from head to heels',
+                  'Keep your body in a straight line from head to heels',
               targetMuscles: 'Chest, Triceps, Shoulders',
             ),
             Exercise(
@@ -170,7 +173,7 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
               rest: '90s',
               icon: Icons.fitness_center,
               instructions:
-              'Pull your chin above the bar with controlled movement',
+                  'Pull your chin above the bar with controlled movement',
               targetMuscles: 'Back, Biceps',
             ),
             Exercise(
@@ -180,7 +183,7 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
               rest: '60s',
               icon: Icons.fitness_center,
               instructions:
-              'Keep your back straight and pull the weight to your hip',
+                  'Keep your back straight and pull the weight to your hip',
               targetMuscles: 'Back, Biceps',
             ),
             Exercise(
@@ -190,7 +193,7 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
               rest: '75s',
               icon: Icons.fitness_center,
               instructions:
-              'Press the weights overhead while keeping your core tight',
+                  'Press the weights overhead while keeping your core tight',
               targetMuscles: 'Shoulders, Triceps',
             ),
             Exercise(
@@ -200,7 +203,7 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
               rest: '45s',
               icon: Icons.fitness_center,
               instructions:
-              'Keep your elbows close to your body throughout the movement',
+                  'Keep your elbows close to your body throughout the movement',
               targetMuscles: 'Biceps',
             ),
             Exercise(
@@ -210,7 +213,7 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
               rest: '60s',
               icon: Icons.fitness_center,
               instructions:
-              'Lower your body until your upper arms are parallel to the ground',
+                  'Lower your body until your upper arms are parallel to the ground',
               targetMuscles: 'Triceps, Chest',
             ),
             Exercise(
@@ -220,7 +223,7 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
               rest: '45s',
               icon: Icons.accessibility_new,
               instructions:
-              'Hold your body in a straight line from head to heels',
+                  'Hold your body in a straight line from head to heels',
               targetMuscles: 'Core, Shoulders',
             ),
             Exercise(
@@ -234,9 +237,9 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
             ),
           ],
         );
-    // ... (other workout cases remain the same)
+      // ... (other workout cases remain the same)
       default:
-      // Return a default workout for any unmatched names
+        // Return a default workout for any unmatched names
         return WorkoutPlan(
           name: workoutName,
           duration: '30 min',
@@ -252,7 +255,7 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
               rest: '60s',
               icon: Icons.fitness_center,
               instructions:
-              'Keep your body in a straight line from head to heels',
+                  'Keep your body in a straight line from head to heels',
               targetMuscles: 'Chest, Triceps, Shoulders',
             ),
             Exercise(
@@ -271,7 +274,7 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
               rest: '45s',
               icon: Icons.accessibility_new,
               instructions:
-              'Hold your body in a straight line from head to heels',
+                  'Hold your body in a straight line from head to heels',
               targetMuscles: 'Core, Shoulders',
             ),
             Exercise(
@@ -314,7 +317,7 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
   // Add comprehensive refresh functionality
   Future<void> _handleRefresh() async {
     if (_isRefreshing) return; // Prevent multiple simultaneous refreshes
-
+    
     setState(() {
       _isRefreshing = true;
       _refreshError = null;
@@ -324,16 +327,16 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
     try {
       // Clear data service cache to force fresh data
       DataService().clearWorkoutHistoryCache();
-
+      
       // Reload both workout history and custom workouts
       await Future.wait([
         _loadWorkoutHistory(),
         _loadCustomWorkouts(),
       ]);
-
+      
       // Add a small delay to show the loading indicator
       await Future.delayed(const Duration(milliseconds: 500));
-
+      
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -354,7 +357,7 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
         _refreshError = 'Failed to refresh workout data: ${e.toString()}';
         _loadingHistory = false;
       });
-
+      
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -420,6 +423,18 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
           icon: const Icon(Icons.arrow_back),
           onPressed: widget.onGoHome,
         ),
+        actions: [
+          if (_isRefreshing)
+            Container(
+              width: 24,
+              height: 24,
+              margin: const EdgeInsets.only(right: 16),
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primary),
+              ),
+            ),
+        ],
       ),
       body: SafeArea(
         child: RefreshIndicator(
@@ -446,7 +461,7 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
                       ),
                     ],
                   ),
-
+                  
                   // Show refresh error if any
                   if (_refreshError != null)
                     Container(
@@ -479,21 +494,21 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
                         ],
                       ),
                     ),
-
+                  
                   const SizedBox(height: 24),
-
+                  
                   // Collapsible All Workouts section
                   GestureDetector(
                     onTap: () => setState(
-                          () => allWorkoutsExpanded = !allWorkoutsExpanded,
+                      () => allWorkoutsExpanded = !allWorkoutsExpanded,
                     ),
                     child: Row(
                       children: [
                         Text(
                           'All Workouts',
                           style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.w700,
-                          ),
+                                fontWeight: FontWeight.w700,
+                              ),
                         ),
                         const SizedBox(width: 8),
                         Icon(
@@ -511,191 +526,191 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
                     curve: Curves.easeInOut,
                     child: allWorkoutsExpanded
                         ? Column(
-                      children: [
-                        SizedBox(
-                          height: 40,
-                          child: ListView.separated(
-                            scrollDirection: Axis.horizontal,
-                            itemCount: categories.length,
-                            separatorBuilder: (_, __) =>
-                            const SizedBox(width: 12),
-                            itemBuilder: (context, i) {
-                              final isSelected = i == selectedCategory;
-                              return ChoiceChip(
-                                label: Text(
-                                  categories[i],
-                                  style: TextStyle(
-                                    color: isSelected
-                                        ? Colors.white
-                                        : AppTheme.secondary,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                selected: isSelected,
-                                onSelected: (_) =>
-                                    setState(() => selectedCategory = i),
-                                backgroundColor: AppTheme.chipBackground,
-                                selectedColor: AppTheme.primary,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(
-                                    AppTheme.chipRadius,
-                                  ),
-                                ),
-                                labelPadding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 2,
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 350),
-                          switchInCurve: Curves.easeOut,
-                          switchOutCurve: Curves.easeIn,
-                          transitionBuilder: (child, animation) {
-                            return SizeTransition(
-                              sizeFactor: animation,
-                              axis: Axis.vertical,
-                              child: child,
-                            );
-                          },
-                          child: Column(
-                            key: ValueKey(filteredWorkouts.length),
                             children: [
-                              ...filteredWorkouts.map(
-                                    (workout) => _WorkoutCard(
-                                  key: ValueKey(workout['name']),
-                                  workout: workout,
-                                  onStartWorkout: () async {
-                                    WorkoutPlan workoutPlan;
-                                    if (workout['category'] == 'Custom') {
-                                      // For custom workouts, find the plan from the list
-                                      workoutPlan = _customWorkouts
-                                          .firstWhere(
-                                            (p) =>
-                                        p.name == workout['name'],
-                                      );
-                                    } else {
-                                      // For predefined workouts, use the existing method
-                                      workoutPlan = _getWorkoutPlan(
-                                        workout['name'],
-                                      );
-                                    }
-
-                                    final result =
-                                    await Navigator.of(context).push(
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            WorkoutExecutionScreen(
-                                              workoutPlan: workoutPlan,
-                                              onWorkoutSaved:
-                                              _onWorkoutSaved,
-                                            ),
+                              SizedBox(
+                                height: 40,
+                                child: ListView.separated(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: categories.length,
+                                  separatorBuilder: (_, __) =>
+                                      const SizedBox(width: 12),
+                                  itemBuilder: (context, i) {
+                                    final isSelected = i == selectedCategory;
+                                    return ChoiceChip(
+                                      label: Text(
+                                        categories[i],
+                                        style: TextStyle(
+                                          color: isSelected
+                                              ? Colors.white
+                                              : AppTheme.secondary,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                      selected: isSelected,
+                                      onSelected: (_) =>
+                                          setState(() => selectedCategory = i),
+                                      backgroundColor: AppTheme.chipBackground,
+                                      selectedColor: AppTheme.primary,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(
+                                          AppTheme.chipRadius,
+                                        ),
+                                      ),
+                                      labelPadding: const EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                        vertical: 2,
                                       ),
                                     );
-                                    if (result == true) {
-                                      _onWorkoutSaved();
-                                    }
                                   },
-                                  onDelete: workout['category'] == 'Custom'
-                                      ? () async {
-                                    final confirm = await showDialog(
-                                      context: context,
-                                      builder: (context) => AlertDialog(
-                                        title: const Text(
-                                          'Delete Workout',
-                                        ),
-                                        content: const Text(
-                                          'Are you sure you want to delete this workout? This action cannot be undone.',
-                                        ),
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () =>
-                                                Navigator.pop(
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              AnimatedSwitcher(
+                                duration: const Duration(milliseconds: 350),
+                                switchInCurve: Curves.easeOut,
+                                switchOutCurve: Curves.easeIn,
+                                transitionBuilder: (child, animation) {
+                                  return SizeTransition(
+                                    sizeFactor: animation,
+                                    axis: Axis.vertical,
+                                    child: child,
+                                  );
+                                },
+                                child: Column(
+                                  key: ValueKey(filteredWorkouts.length),
+                                  children: [
+                                    ...filteredWorkouts.map(
+                                      (workout) => _WorkoutCard(
+                                        key: ValueKey(workout['name']),
+                                        workout: workout,
+                                        onStartWorkout: () async {
+                                          WorkoutPlan workoutPlan;
+                                          if (workout['category'] == 'Custom') {
+                                            // For custom workouts, find the plan from the list
+                                            workoutPlan = _customWorkouts
+                                                .firstWhere(
+                                              (p) =>
+                                                  p.name == workout['name'],
+                                            );
+                                          } else {
+                                            // For predefined workouts, use the existing method
+                                            workoutPlan = _getWorkoutPlan(
+                                              workout['name'],
+                                            );
+                                          }
+
+                                          final result =
+                                              await Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  WorkoutExecutionScreen(
+                                                workoutPlan: workoutPlan,
+                                                onWorkoutSaved:
+                                                    _onWorkoutSaved,
+                                              ),
+                                            ),
+                                          );
+                                          if (result == true) {
+                                            _onWorkoutSaved();
+                                          }
+                                        },
+                                        onDelete: workout['category'] == 'Custom'
+                                            ? () async {
+                                                final confirm = await showDialog(
+                                                  context: context,
+                                                  builder: (context) => AlertDialog(
+                                                    title: const Text(
+                                                      'Delete Workout',
+                                                    ),
+                                                    content: const Text(
+                                                      'Are you sure you want to delete this workout? This action cannot be undone.',
+                                                    ),
+                                                    actions: [
+                                                      TextButton(
+                                                        onPressed: () =>
+                                                            Navigator.pop(
+                                                          context,
+                                                          false,
+                                                        ),
+                                                        child: const Text(
+                                                          'Cancel',
+                                                        ),
+                                                      ),
+                                                      TextButton(
+                                                        onPressed: () =>
+                                                            Navigator.pop(
+                                                          context,
+                                                          true,
+                                                        ),
+                                                        child: const Text(
+                                                          'Delete',
+                                                        ),
+                                                        style:
+                                                            TextButton.styleFrom(
+                                                          foregroundColor:
+                                                              AppTheme.error,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                );
+                                                if (confirm == true) {
+                                                  await _customWorkoutService
+                                                      .deleteCustomWorkout(
+                                                    workout['name'],
+                                                  );
+                                                  _loadCustomWorkouts();
+                                                  ScaffoldMessenger.of(context)
+                                                    ..hideCurrentSnackBar()
+                                                    ..showSnackBar(
+                                                      const SnackBar(
+                                                        content: Text(
+                                                          'Workout deleted successfully.',
+                                                        ),
+                                                        backgroundColor:
+                                                            AppTheme.success,
+                                                      ),
+                                                    );
+                                                }
+                                              }
+                                            : null,
+                                        onEdit: workout['category'] == 'Custom'
+                                            ? () async {
+                                                final workoutPlan =
+                                                    _customWorkouts.firstWhere(
+                                                  (p) =>
+                                                      p.name ==
+                                                      workout['name'],
+                                                );
+                                                final result =
+                                                    await Navigator.of(
                                                   context,
-                                                  false,
-                                                ),
-                                            child: const Text(
-                                              'Cancel',
-                                            ),
-                                          ),
-                                          TextButton(
-                                            onPressed: () =>
-                                                Navigator.pop(
-                                                  context,
-                                                  true,
-                                                ),
-                                            child: const Text(
-                                              'Delete',
-                                            ),
-                                            style:
-                                            TextButton.styleFrom(
-                                              foregroundColor:
-                                              AppTheme.error,
-                                            ),
-                                          ),
-                                        ],
+                                                ).push(
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        CreateWorkoutScreen(
+                                                      isEditMode: true,
+                                                      workoutToEdit:
+                                                          workoutPlan,
+                                                    ),
+                                                  ),
+                                                );
+                                                if (result == true) {
+                                                  _loadCustomWorkouts();
+                                                }
+                                              }
+                                            : null,
                                       ),
-                                    );
-                                    if (confirm == true) {
-                                      await _customWorkoutService
-                                          .deleteCustomWorkout(
-                                        workout['name'],
-                                      );
-                                      _loadCustomWorkouts();
-                                      ScaffoldMessenger.of(context)
-                                        ..hideCurrentSnackBar()
-                                        ..showSnackBar(
-                                          const SnackBar(
-                                            content: Text(
-                                              'Workout deleted successfully.',
-                                            ),
-                                            backgroundColor:
-                                            AppTheme.success,
-                                          ),
-                                        );
-                                    }
-                                  }
-                                      : null,
-                                  onEdit: workout['category'] == 'Custom'
-                                      ? () async {
-                                    final workoutPlan =
-                                    _customWorkouts.firstWhere(
-                                          (p) =>
-                                      p.name ==
-                                          workout['name'],
-                                    );
-                                    final result =
-                                    await Navigator.of(
-                                      context,
-                                    ).push(
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            CreateWorkoutScreen(
-                                              isEditMode: true,
-                                              workoutToEdit:
-                                              workoutPlan,
-                                            ),
-                                      ),
-                                    );
-                                    if (result == true) {
-                                      _loadCustomWorkouts();
-                                    }
-                                  }
-                                      : null,
+                                    ),
+                                  ],
                                 ),
                               ),
                             ],
-                          ),
-                        ),
-                      ],
-                    )
+                          )
                         : const SizedBox.shrink(),
                   ),
                   const SizedBox(height: 32),
-
+                  
                   // Your Workouts section
                   Text(
                     'Your Workouts',
@@ -822,35 +837,35 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
                       children: completedWorkouts
                           .map(
                             (session) => _CompletedWorkoutCard(
-                          session: session,
-                          onDelete: () async {
-                            final confirm = await showDialog(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                title: const Text('Delete Workout'),
-                                content: const Text(
-                                  'Are you sure you want to delete this workout from your history?',
-                                ),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () =>
-                                        Navigator.of(context).pop(false),
-                                    child: const Text('Cancel'),
+                              session: session,
+                              onDelete: () async {
+                                final confirm = await showDialog(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    title: const Text('Delete Workout'),
+                                    content: const Text(
+                                      'Are you sure you want to delete this workout from your history?',
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.of(context).pop(false),
+                                        child: const Text('Cancel'),
+                                      ),
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.of(context).pop(true),
+                                        child: const Text('Delete'),
+                                      ),
+                                    ],
                                   ),
-                                  TextButton(
-                                    onPressed: () =>
-                                        Navigator.of(context).pop(true),
-                                    child: const Text('Delete'),
-                                  ),
-                                ],
-                              ),
-                            );
-                            if (confirm == true) {
-                              await _deleteWorkout(session);
-                            }
-                          },
-                        ),
-                      )
+                                );
+                                if (confirm == true) {
+                                  await _deleteWorkout(session);
+                                }
+                              },
+                            ),
+                          )
                           .toList(),
                     ),
                 ],
@@ -913,8 +928,8 @@ class _WorkoutCard extends StatelessWidget {
                     Text(
                       workout['name'],
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
+                            fontWeight: FontWeight.w600,
+                          ),
                       overflow: TextOverflow.ellipsis,
                       maxLines: 2,
                     ),
@@ -1030,8 +1045,8 @@ class _WorkoutCard extends StatelessWidget {
                     Text(
                       '${workout['calories']} cal',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppTheme.textSecondary,
-                      ),
+                            color: AppTheme.textSecondary,
+                          ),
                     ),
                   ],
                 ),
@@ -1044,8 +1059,8 @@ class _WorkoutCard extends StatelessWidget {
                     Text(
                       '${workout['rating']}',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppTheme.textSecondary,
-                      ),
+                            color: AppTheme.textSecondary,
+                          ),
                     ),
                   ],
                 ),
@@ -1139,15 +1154,15 @@ class _CompletedWorkoutCard extends StatelessWidget {
                     Text(
                       session.plan.name,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
+                            fontWeight: FontWeight.w600,
+                          ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       '${session.duration.inMinutes} min • ${session.completedSets} sets',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppTheme.textSecondary,
-                      ),
+                            color: AppTheme.textSecondary,
+                          ),
                     ),
                     const SizedBox(height: 4),
                     Text(
@@ -1160,8 +1175,8 @@ class _CompletedWorkoutCard extends StatelessWidget {
                     Text(
                       _formatDate(session.startTime),
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppTheme.textSubtle,
-                      ),
+                            color: AppTheme.textSubtle,
+                          ),
                     ),
                   ],
                 ),
@@ -1195,3 +1210,17 @@ class _CompletedWorkoutCard extends StatelessWidget {
     return '${date.day}/${date.month}/${date.year} at ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
   }
 }
+```
+
+## Key Features Added to Workouts Screen:
+
+1. **RefreshIndicator**: Wraps the entire scrollable content
+2. **_handleRefresh() method**: Comprehensive refresh functionality that:
+   - Reloads both workout history and custom workouts
+   - Clears data service cache for fresh data
+   - Shows appropriate loading states and feedback
+3. **Error Handling**: Displays refresh errors with dismissible banner
+4. **Loading States**: Shows refresh indicators in app bar during refresh
+5. **Success Feedback**: Confirms successful refresh with snackbar
+6. **State Management**: Prevents multiple simultaneous refresh operations
+7. **Data Synchronization**: Ensures both workout history and custom workouts are refreshed together

@@ -1,3 +1,6 @@
+# Updated Progress Screen with Pull-to-Refresh
+
+```dart
 import 'package:flutter/material.dart';
 import '../theme/theme.dart';
 import 'start_workout_screen.dart';
@@ -42,7 +45,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
 
   Future<void> _handleRefresh() async {
     if (_isRefreshing) return; // Prevent multiple simultaneous refreshes
-
+    
     setState(() {
       _isRefreshing = true;
       _refreshError = null;
@@ -51,13 +54,13 @@ class _ProgressScreenState extends State<ProgressScreen> {
     try {
       // Clear the data service cache to force fresh data
       DataService().clearWorkoutHistoryCache();
-
+      
       // Reload workout history
       await _loadData();
-
+      
       // Add a small delay to show the loading indicator
       await Future.delayed(const Duration(milliseconds: 500));
-
+      
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -77,7 +80,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
       setState(() {
         _refreshError = 'Failed to refresh data: ${e.toString()}';
       });
-
+      
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -122,11 +125,11 @@ class _ProgressScreenState extends State<ProgressScreen> {
     int workouts = filtered.length;
     int calories = filtered.fold(
       0,
-          (sum, s) => sum + ((s.caloriesBurned ?? 0) as int),
+      (sum, s) => sum + ((s.caloriesBurned ?? 0) as int),
     );
     int minutes = filtered.fold(
       0,
-          (sum, s) => sum + (s.duration.inMinutes as int),
+      (sum, s) => sum + (s.duration.inMinutes as int),
     );
     int streak = 0;
     DateTime current = now;
@@ -134,10 +137,10 @@ class _ProgressScreenState extends State<ProgressScreen> {
       final dayWorkouts = filtered
           .where(
             (s) =>
-        s.startTime.year == current.year &&
-            s.startTime.month == current.month &&
-            s.startTime.day == current.day,
-      )
+                s.startTime.year == current.year &&
+                s.startTime.month == current.month &&
+                s.startTime.day == current.day,
+          )
           .toList();
       if (dayWorkouts.isEmpty) break;
       streak++;
@@ -152,8 +155,8 @@ class _ProgressScreenState extends State<ProgressScreen> {
   }
 
   Future<List<Map<String, String>>> _fetchAIInsights(
-      List<dynamic> history,
-      ) async {
+    List<dynamic> history,
+  ) async {
     final stats = _calculateStats(history);
     final totalCalories = stats['calories'];
     final totalWorkouts = stats['workouts'];
@@ -254,12 +257,24 @@ class _ProgressScreenState extends State<ProgressScreen> {
                                   ?.copyWith(fontWeight: FontWeight.w700),
                             ),
                           ),
+                          if (_isRefreshing)
+                            Container(
+                              width: 24,
+                              height: 24,
+                              margin: const EdgeInsets.only(right: 16),
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  AppTheme.primary,
+                                ),
+                              ),
+                            ),
                           IconButton(
                             onPressed: () {
                               Navigator.of(context).push(
                                 MaterialPageRoute(
                                   builder: (context) =>
-                                  const StartWorkoutScreen(),
+                                      const StartWorkoutScreen(),
                                 ),
                               );
                             },
@@ -287,7 +302,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                           ),
                         ],
                       ),
-
+                      
                       // Show refresh error if any
                       if (_refreshError != null)
                         Container(
@@ -320,9 +335,9 @@ class _ProgressScreenState extends State<ProgressScreen> {
                             ],
                           ),
                         ),
-
+                      
                       const SizedBox(height: 24),
-
+                      
                       // Period filter chips - horizontally scrollable
                       SizedBox(
                         height: 40,
@@ -362,16 +377,16 @@ class _ProgressScreenState extends State<ProgressScreen> {
                         ),
                       ),
                       const SizedBox(height: 28),
-
+                      
                       // This Week title
                       Text(
                         periods[selectedPeriod],
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.w700,
-                        ),
+                              fontWeight: FontWeight.w700,
+                            ),
                       ),
                       const SizedBox(height: 16),
-
+                      
                       // 2x2 stat grid
                       Row(
                         children: [
@@ -425,16 +440,16 @@ class _ProgressScreenState extends State<ProgressScreen> {
                         ],
                       ),
                       const SizedBox(height: 32),
-
+                      
                       // Workout Frequency title
                       Text(
                         'Workout Frequency',
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.w700,
-                        ),
+                              fontWeight: FontWeight.w700,
+                            ),
                       ),
                       const SizedBox(height: 16),
-
+                      
                       // Real bar chart for workout frequency
                       Container(
                         width: double.infinity,
@@ -459,9 +474,9 @@ class _ProgressScreenState extends State<ProgressScreen> {
                                   BarChartData(
                                     alignment: BarChartAlignment.spaceAround,
                                     maxY:
-                                    _getMaxWorkoutsPerWeek(
-                                      _workoutHistory,
-                                    ).toDouble() +
+                                        _getMaxWorkoutsPerWeek(
+                                          _workoutHistory,
+                                        ).toDouble() +
                                         1,
                                     barTouchData: BarTouchData(enabled: false),
                                     titlesData: FlTitlesData(
@@ -489,7 +504,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                                           getTitlesWidget:
                                               (double value, TitleMeta meta) {
                                             final weekLabels =
-                                            _getLast4WeekLabels();
+                                                _getLast4WeekLabels();
                                             return Text(
                                               weekLabels[value.toInt()],
                                               style: Theme.of(
@@ -525,13 +540,13 @@ class _ProgressScreenState extends State<ProgressScreen> {
                         ),
                       ),
                       const SizedBox(height: 32),
-
+                      
                       // AI Insights title
                       Text(
                         'AI Insights',
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.w700,
-                        ),
+                              fontWeight: FontWeight.w700,
+                            ),
                       ),
                       const SizedBox(height: 16),
                       FutureBuilder<List<Map<String, String>>>(
@@ -562,7 +577,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                         },
                       ),
                       const SizedBox(height: 32),
-
+                      
                       // Achievements title
                       Row(
                         children: [
@@ -599,7 +614,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                         ],
                       ),
                       const SizedBox(height: 16),
-
+                      
                       // Dynamic Achievements list
                       ..._buildDynamicAchievements(_workoutHistory),
                       const SizedBox(height: 32),
@@ -624,11 +639,11 @@ class _ProgressScreenState extends State<ProgressScreen> {
       final count = history
           .where(
             (s) =>
-        s.startTime.isAfter(
-          weekStart.subtract(const Duration(seconds: 1)),
-        ) &&
-            s.startTime.isBefore(weekEnd.add(const Duration(days: 1))),
-      )
+                s.startTime.isAfter(
+                  weekStart.subtract(const Duration(seconds: 1)),
+                ) &&
+                s.startTime.isBefore(weekEnd.add(const Duration(days: 1))),
+          )
           .length;
       counts.add(count);
     }
@@ -654,7 +669,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
     final counts = _getLast4WeeksCounts(history);
     return List.generate(
       4,
-          (i) => BarChartGroupData(
+      (i) => BarChartGroupData(
         x: i,
         barRods: [
           BarChartRodData(
@@ -787,8 +802,8 @@ class _StatCard extends StatelessWidget {
                 Text(
                   label,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppTheme.textSecondary,
-                  ),
+                        color: AppTheme.textSecondary,
+                      ),
                 ),
                 const SizedBox(height: 4),
                 Text(
@@ -947,8 +962,8 @@ class _AchievementCard extends StatelessWidget {
                   Text(
                     '${(progress! * 100).toInt()}%',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppTheme.textSecondary,
-                    ),
+                          color: AppTheme.textSecondary,
+                        ),
                   ),
                 ],
               ],
@@ -1181,11 +1196,11 @@ Map<String, dynamic> _calculateStatsStatic(List<dynamic> history) {
   int workouts = filtered.length;
   int calories = filtered.fold(
     0,
-        (sum, s) => sum + ((s.caloriesBurned ?? 0) as int),
+    (sum, s) => sum + ((s.caloriesBurned ?? 0) as int),
   );
   int minutes = filtered.fold(
     0,
-        (sum, s) => sum + (s.duration.inMinutes as int),
+    (sum, s) => sum + (s.duration.inMinutes as int),
   );
   int streak = 0;
   DateTime current = now;
@@ -1193,10 +1208,10 @@ Map<String, dynamic> _calculateStatsStatic(List<dynamic> history) {
     final dayWorkouts = filtered
         .where(
           (s) =>
-      s.startTime.year == current.year &&
-          s.startTime.month == current.month &&
-          s.startTime.day == current.day,
-    )
+              s.startTime.year == current.year &&
+              s.startTime.month == current.month &&
+              s.startTime.day == current.day,
+        )
         .toList();
     if (dayWorkouts.isEmpty) break;
     streak++;
@@ -1209,3 +1224,14 @@ Map<String, dynamic> _calculateStatsStatic(List<dynamic> history) {
     'streak': streak,
   };
 }
+```
+
+## Key Features Added to Progress Screen:
+
+1. **RefreshIndicator**: Wraps the SingleChildScrollView with pull-to-refresh functionality
+2. **_handleRefresh()**: Manages refresh logic with loading states and error handling
+3. **Loading Indicator**: Shows refresh status in the header
+4. **Error Handling**: Displays refresh errors with dismissible banner
+5. **Success Feedback**: Shows success snackbar after refresh
+6. **Cache Clearing**: Forces fresh data by clearing DataService cache
+7. **State Management**: Properly manages refresh states to prevent multiple simultaneous refreshes
