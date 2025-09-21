@@ -24,15 +24,85 @@ class _ProgressScreenState extends State<ProgressScreen> {
     'This Year',
   ];
 
-  Future<List<dynamic>> _futureHistory = DataService().getWorkoutHistory();
+  Future<List<dynamic>>? _futureHistory;
+  bool _isRefreshing = false;
+  String? _refreshError;
 
   @override
   void initState() {
     super.initState();
-    _futureHistory = DataService().getWorkoutHistory();
+    _loadData();
   }
 
-  Map<String, int> _calculateStats(List<dynamic> history) {
+  Future<void> _loadData() async {
+    setState(() {
+      _futureHistory = DataService().getWorkoutHistory();
+    });
+  }
+
+  Future<void> _handleRefresh() async {
+    if (_isRefreshing) return; // Prevent multiple simultaneous refreshes
+
+    setState(() {
+      _isRefreshing = true;
+      _refreshError = null;
+    });
+
+    try {
+      // Clear the data service cache to force fresh data
+      DataService().clearWorkoutHistoryCache();
+
+      // Reload workout history
+      await _loadData();
+
+      // Add a small delay to show the loading indicator
+      await Future.delayed(const Duration(milliseconds: 500));
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Row(
+              children: [
+                Icon(Icons.check_circle, color: Colors.white),
+                SizedBox(width: 8),
+                Text('Progress data refreshed successfully'),
+              ],
+            ),
+            backgroundColor: AppTheme.success,
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      setState(() {
+        _refreshError = 'Failed to refresh data: ${e.toString()}';
+      });
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.error, color: Colors.white),
+                const SizedBox(width: 8),
+                Expanded(child: Text(_refreshError!)),
+              ],
+            ),
+            backgroundColor: AppTheme.error,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isRefreshing = false;
+        });
+      }
+    }
+  }
+
+  Map<String, dynamic> _calculateStats(List<dynamic> history) {
     final now = DateTime.now();
     DateTime start;
     if (selectedPeriod == 0) {
@@ -50,13 +120,13 @@ class _ProgressScreenState extends State<ProgressScreen> {
     }
     final filtered = history.where((s) => s.startTime.isAfter(start)).toList();
     int workouts = filtered.length;
-    int calories = filtered.fold<int>(
+    int calories = filtered.fold(
       0,
-      (sum, s) => sum + ((s.caloriesBurned ?? 0) as int),
+          (sum, s) => sum + ((s.caloriesBurned ?? 0) as int),
     );
-    int minutes = filtered.fold<int>(
+    int minutes = filtered.fold(
       0,
-      (sum, s) => sum + (s.duration.inMinutes as int),
+          (sum, s) => sum + (s.duration.inMinutes as int),
     );
     int streak = 0;
     DateTime current = now;
@@ -64,10 +134,10 @@ class _ProgressScreenState extends State<ProgressScreen> {
       final dayWorkouts = filtered
           .where(
             (s) =>
-                s.startTime.year == current.year &&
-                s.startTime.month == current.month &&
-                s.startTime.day == current.day,
-          )
+        s.startTime.year == current.year &&
+            s.startTime.month == current.month &&
+            s.startTime.day == current.day,
+      )
           .toList();
       if (dayWorkouts.isEmpty) break;
       streak++;
@@ -82,8 +152,8 @@ class _ProgressScreenState extends State<ProgressScreen> {
   }
 
   Future<List<Map<String, String>>> _fetchAIInsights(
-    List<dynamic> history,
-  ) async {
+      List<dynamic> history,
+      ) async {
     final stats = _calculateStats(history);
     final totalCalories = stats['calories'];
     final totalWorkouts = stats['workouts'];
@@ -123,7 +193,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
       final content =
           data['candidates']?[0]?['content']?['parts']?[0]?['text']
               ?.toString() ??
-          '';
+              '';
       // Parse the numbered list into cards
       final lines = content
           .split(RegExp(r'\n|\r'))
@@ -131,7 +201,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
           .toList();
       final insights = <Map<String, String>>[];
       for (final line in lines) {
-        final match = RegExp(r'\d+\.\s*(.+?)\s*\[(.+?)\]').firstMatch(line);
+        final match = RegExp(r'\d+\.\s*(.*?)\s*\[(.*?)\]').firstMatch(line);
         if (match != null) {
           insights.add({
             'title': match.group(1) ?? '',
@@ -162,330 +232,379 @@ class _ProgressScreenState extends State<ProgressScreen> {
         return Scaffold(
           backgroundColor: AppTheme.background,
           body: SafeArea(
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: AppTheme.paddingLG,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Title and navigation buttons
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            'Progress',
-                            style: Theme.of(context).textTheme.displayMedium
-                                ?.copyWith(fontWeight: FontWeight.w700),
-                          ),
-                        ),
-                        IconButton(
-                          onPressed: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    const StartWorkoutScreen(),
-                              ),
-                            );
-                          },
-                          icon: const Icon(Icons.fitness_center),
-                          style: IconButton.styleFrom(
-                            backgroundColor: AppTheme.primary,
-                            foregroundColor: Colors.white,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        IconButton(
-                          onPressed: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => const ScheduleScreen(),
-                              ),
-                            );
-                          },
-                          icon: const Icon(Icons.schedule),
-                          style: IconButton.styleFrom(
-                            backgroundColor: AppTheme.surface,
-                            foregroundColor: AppTheme.primary,
-                            side: BorderSide(color: AppTheme.primary),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 24),
-                    // Period filter chips - horizontally scrollable
-                    SizedBox(
-                      height: 40,
-                      child: ListView.separated(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: periods.length,
-                        separatorBuilder: (_, __) => const SizedBox(width: 12),
-                        itemBuilder: (context, i) {
-                          final isSelected = i == selectedPeriod;
-                          return ChoiceChip(
-                            label: Text(
-                              periods[i],
-                              style: TextStyle(
-                                color: isSelected
-                                    ? Colors.white
-                                    : AppTheme.secondary,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            selected: isSelected,
-                            onSelected: (_) => setState(() {
-                              selectedPeriod = i;
-                            }),
-                            backgroundColor: AppTheme.chipBackground,
-                            selectedColor: AppTheme.primary,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(
-                                AppTheme.chipRadius,
-                              ),
-                            ),
-                            labelPadding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 2,
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    const SizedBox(height: 28),
-                    // This Week title
-                    Text(
-                      periods[selectedPeriod],
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    // 2x2 stat grid
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _StatCard(
-                            icon: Icons.track_changes,
-                            iconColor: AppTheme.primary,
-                            value: stats['workouts'].toString(),
-                            label: 'Workouts',
-                            delta: '',
-                            deltaColor: AppTheme.success,
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: _StatCard(
-                            icon: Icons.local_fire_department,
-                            iconColor: AppTheme.warning,
-                            value: stats['calories'].toString(),
-                            label: 'Calories',
-                            delta: '',
-                            deltaColor: AppTheme.success,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _StatCard(
-                            icon: Icons.access_time,
-                            iconColor: Colors.purple,
-                            value: stats['minutes'].toString(),
-                            label: 'Minutes',
-                            delta: '',
-                            deltaColor: AppTheme.success,
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: _StatCard(
-                            icon: Icons.flash_on,
-                            iconColor: AppTheme.success,
-                            value: stats['streak'].toString(),
-                            label: 'Day Streak',
-                            delta: '',
-                            deltaColor: AppTheme.success,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 32),
-                    // Workout Frequency title
-                    Text(
-                      'Workout Frequency',
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    // Real bar chart for workout frequency
-                    Container(
-                      width: double.infinity,
-                      height: 220,
-                      padding: AppTheme.cardPadding,
-                      decoration: BoxDecoration(
-                        color: AppTheme.cardBackground,
-                        borderRadius: BorderRadius.circular(
-                          AppTheme.cardRadius,
-                        ),
-                        boxShadow: AppTheme.cardShadow,
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
+            child: RefreshIndicator(
+              onRefresh: _handleRefresh,
+              color: AppTheme.primary,
+              backgroundColor: Colors.white,
+              strokeWidth: 3.0,
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: Padding(
+                  padding: AppTheme.paddingLG,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Title and navigation buttons
+                      Row(
                         children: [
                           Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8.0,
-                              ),
-                              child: BarChart(
-                                BarChartData(
-                                  alignment: BarChartAlignment.spaceAround,
-                                  maxY:
-                                      _getMaxWorkoutsPerWeek(
-                                        _workoutHistory,
-                                      ).toDouble() +
-                                      1,
-                                  barTouchData: BarTouchData(enabled: false),
-                                  titlesData: FlTitlesData(
-                                    leftTitles: AxisTitles(
-                                      sideTitles: SideTitles(
-                                        showTitles: true,
-                                        reservedSize: 28,
-                                        getTitlesWidget:
-                                            (double value, TitleMeta meta) {
-                                              if (value % 1 != 0)
-                                                return const SizedBox.shrink();
-                                              return Text(
-                                                value.toInt().toString(),
-                                                style: Theme.of(
-                                                  context,
-                                                ).textTheme.bodySmall,
-                                              );
-                                            },
-                                        interval: 1,
-                                      ),
-                                    ),
-                                    bottomTitles: AxisTitles(
-                                      sideTitles: SideTitles(
-                                        showTitles: true,
-                                        getTitlesWidget:
-                                            (double value, TitleMeta meta) {
-                                              final weekLabels =
-                                                  _getLast4WeekLabels();
-                                              return Text(
-                                                weekLabels[value.toInt()],
-                                                style: Theme.of(
-                                                  context,
-                                                ).textTheme.bodySmall,
-                                              );
-                                            },
-                                      ),
-                                    ),
-                                    rightTitles: AxisTitles(
-                                      sideTitles: SideTitles(showTitles: false),
-                                    ),
-                                    topTitles: AxisTitles(
-                                      sideTitles: SideTitles(showTitles: false),
-                                    ),
-                                  ),
-                                  borderData: FlBorderData(show: false),
-                                  gridData: FlGridData(show: false),
-                                  barGroups: _getLast4WeeksBarGroups(
-                                    _workoutHistory,
-                                  ),
-                                ),
-                              ),
+                            child: Text(
+                              'Progress',
+                              style: Theme.of(context).textTheme.displayMedium
+                                  ?.copyWith(fontWeight: FontWeight.w700),
                             ),
                           ),
-                          const SizedBox(height: 16),
-                          Text(
-                            'Workouts completed per week',
-                            style: Theme.of(context).textTheme.bodyMedium
-                                ?.copyWith(color: AppTheme.textSecondary),
+                          IconButton(
+                            onPressed: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                  const StartWorkoutScreen(),
+                                ),
+                              );
+                            },
+                            icon: const Icon(Icons.fitness_center),
+                            style: IconButton.styleFrom(
+                              backgroundColor: AppTheme.primary,
+                              foregroundColor: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          IconButton(
+                            onPressed: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => const ScheduleScreen(),
+                                ),
+                              );
+                            },
+                            icon: const Icon(Icons.schedule),
+                            style: IconButton.styleFrom(
+                              backgroundColor: AppTheme.surface,
+                              foregroundColor: AppTheme.primary,
+                              side: BorderSide(color: AppTheme.primary),
+                            ),
                           ),
                         ],
                       ),
-                    ),
-                    const SizedBox(height: 32),
-                    // AI Insights title
-                    Text(
-                      'AI Insights',
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    FutureBuilder<List<Map<String, String>>>(
-                      future: _fetchAIInsights(_workoutHistory),
-                      builder: (context, snapshot) {
-                        if (!snapshot.hasData) {
-                          return const Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        }
-                        final insights = snapshot.data!;
-                        return Column(
-                          children: [
-                            for (final insight in insights)
-                              Padding(
-                                padding: const EdgeInsets.only(bottom: 12),
-                                child: _InsightCard(
-                                  icon: Icons.trending_up,
-                                  iconColor: AppTheme.success,
-                                  title: insight['title'] ?? '',
-                                  subtitle: '',
-                                  badge: insight['badge'] ?? '',
-                                  badgeColor: AppTheme.success,
+
+                      // Show refresh error if any
+                      if (_refreshError != null)
+                        Container(
+                          margin: const EdgeInsets.only(top: 16),
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: AppTheme.error.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: AppTheme.error.withOpacity(0.3)),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(Icons.error, color: AppTheme.error, size: 20),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  _refreshError!,
+                                  style: TextStyle(
+                                    color: AppTheme.error,
+                                    fontSize: 14,
+                                  ),
                                 ),
                               ),
-                          ],
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 32),
-                    // Achievements title
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            'Achievements',
-                            style: Theme.of(context).textTheme.titleLarge
-                                ?.copyWith(fontWeight: FontWeight.w700),
+                              IconButton(
+                                onPressed: () => setState(() => _refreshError = null),
+                                icon: Icon(Icons.close, color: AppTheme.error, size: 16),
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints(),
+                              ),
+                            ],
                           ),
                         ),
-                        TextButton(
-                          onPressed: () {
-                            showModalBottomSheet(
-                              context: context,
-                              isScrollControlled: true,
-                              shape: const RoundedRectangleBorder(
-                                borderRadius: BorderRadius.vertical(
-                                  top: Radius.circular(24),
+
+                      const SizedBox(height: 24),
+
+                      // Period filter chips - horizontally scrollable
+                      SizedBox(
+                        height: 40,
+                        child: ListView.separated(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: periods.length,
+                          separatorBuilder: (_, __) => const SizedBox(width: 12),
+                          itemBuilder: (context, i) {
+                            final isSelected = i == selectedPeriod;
+                            return ChoiceChip(
+                              label: Text(
+                                periods[i],
+                                style: TextStyle(
+                                  color: isSelected
+                                      ? Colors.white
+                                      : AppTheme.secondary,
+                                  fontWeight: FontWeight.w500,
                                 ),
                               ),
-                              builder: (context) => _AllAchievementsSheet(
-                                history: _workoutHistory,
+                              selected: isSelected,
+                              onSelected: (_) => setState(() {
+                                selectedPeriod = i;
+                              }),
+                              backgroundColor: AppTheme.chipBackground,
+                              selectedColor: AppTheme.primary,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(
+                                  AppTheme.chipRadius,
+                                ),
+                              ),
+                              labelPadding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 2,
                               ),
                             );
                           },
-                          child: const Text('See All'),
-                          style: TextButton.styleFrom(
-                            foregroundColor: AppTheme.primary,
-                            textStyle: const TextStyle(
-                              fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 28),
+
+                      // This Week title
+                      Text(
+                        periods[selectedPeriod],
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      // 2x2 stat grid
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _StatCard(
+                              icon: Icons.track_changes,
+                              iconColor: AppTheme.primary,
+                              value: stats['workouts'].toString(),
+                              label: 'Workouts',
+                              delta: '',
+                              deltaColor: AppTheme.success,
                             ),
                           ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: _StatCard(
+                              icon: Icons.local_fire_department,
+                              iconColor: AppTheme.warning,
+                              value: stats['calories'].toString(),
+                              label: 'Calories',
+                              delta: '',
+                              deltaColor: AppTheme.success,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _StatCard(
+                              icon: Icons.access_time,
+                              iconColor: Colors.purple,
+                              value: stats['minutes'].toString(),
+                              label: 'Minutes',
+                              delta: '',
+                              deltaColor: AppTheme.success,
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: _StatCard(
+                              icon: Icons.flash_on,
+                              iconColor: AppTheme.success,
+                              value: stats['streak'].toString(),
+                              label: 'Day Streak',
+                              delta: '',
+                              deltaColor: AppTheme.success,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 32),
+
+                      // Workout Frequency title
+                      Text(
+                        'Workout Frequency',
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w700,
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    // Dynamic Achievements list
-                    ..._buildDynamicAchievements(_workoutHistory),
-                    const SizedBox(height: 32),
-                  ],
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Real bar chart for workout frequency
+                      Container(
+                        width: double.infinity,
+                        height: 220,
+                        padding: AppTheme.cardPadding,
+                        decoration: BoxDecoration(
+                          color: AppTheme.cardBackground,
+                          borderRadius: BorderRadius.circular(
+                            AppTheme.cardRadius,
+                          ),
+                          boxShadow: AppTheme.cardShadow,
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8.0,
+                                ),
+                                child: BarChart(
+                                  BarChartData(
+                                    alignment: BarChartAlignment.spaceAround,
+                                    maxY:
+                                    _getMaxWorkoutsPerWeek(
+                                      _workoutHistory,
+                                    ).toDouble() +
+                                        1,
+                                    barTouchData: BarTouchData(enabled: false),
+                                    titlesData: FlTitlesData(
+                                      leftTitles: AxisTitles(
+                                        sideTitles: SideTitles(
+                                          showTitles: true,
+                                          reservedSize: 28,
+                                          getTitlesWidget:
+                                              (double value, TitleMeta meta) {
+                                            if (value % 1 != 0)
+                                              return const SizedBox.shrink();
+                                            return Text(
+                                              value.toInt().toString(),
+                                              style: Theme.of(
+                                                context,
+                                              ).textTheme.bodySmall,
+                                            );
+                                          },
+                                          interval: 1,
+                                        ),
+                                      ),
+                                      bottomTitles: AxisTitles(
+                                        sideTitles: SideTitles(
+                                          showTitles: true,
+                                          getTitlesWidget:
+                                              (double value, TitleMeta meta) {
+                                            final weekLabels =
+                                            _getLast4WeekLabels();
+                                            return Text(
+                                              weekLabels[value.toInt()],
+                                              style: Theme.of(
+                                                context,
+                                              ).textTheme.bodySmall,
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                      rightTitles: AxisTitles(
+                                        sideTitles: SideTitles(showTitles: false),
+                                      ),
+                                      topTitles: AxisTitles(
+                                        sideTitles: SideTitles(showTitles: false),
+                                      ),
+                                    ),
+                                    borderData: FlBorderData(show: false),
+                                    gridData: FlGridData(show: false),
+                                    barGroups: _getLast4WeeksBarGroups(
+                                      _workoutHistory,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              'Workouts completed per week',
+                              style: Theme.of(context).textTheme.bodyMedium
+                                  ?.copyWith(color: AppTheme.textSecondary),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 32),
+
+                      // AI Insights title
+                      Text(
+                        'AI Insights',
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      FutureBuilder<List<Map<String, String>>>(
+                        future: _fetchAIInsights(_workoutHistory),
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData) {
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+                          final insights = snapshot.data!;
+                          return Column(
+                            children: [
+                              for (final insight in insights)
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 12),
+                                  child: _InsightCard(
+                                    icon: Icons.trending_up,
+                                    iconColor: AppTheme.success,
+                                    title: insight['title'] ?? '',
+                                    subtitle: '',
+                                    badge: insight['badge'] ?? '',
+                                    badgeColor: AppTheme.success,
+                                  ),
+                                ),
+                            ],
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 32),
+
+                      // Achievements title
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              'Achievements',
+                              style: Theme.of(context).textTheme.titleLarge
+                                  ?.copyWith(fontWeight: FontWeight.w700),
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              showModalBottomSheet(
+                                context: context,
+                                isScrollControlled: true,
+                                shape: const RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.vertical(
+                                    top: Radius.circular(24),
+                                  ),
+                                ),
+                                builder: (context) => _AllAchievementsSheet(
+                                  history: _workoutHistory,
+                                ),
+                              );
+                            },
+                            child: const Text('See All'),
+                            style: TextButton.styleFrom(
+                              foregroundColor: AppTheme.primary,
+                              textStyle: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Dynamic Achievements list
+                      ..._buildDynamicAchievements(_workoutHistory),
+                      const SizedBox(height: 32),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -505,11 +624,11 @@ class _ProgressScreenState extends State<ProgressScreen> {
       final count = history
           .where(
             (s) =>
-                s.startTime.isAfter(
-                  weekStart.subtract(const Duration(seconds: 1)),
-                ) &&
-                s.startTime.isBefore(weekEnd.add(const Duration(days: 1))),
-          )
+        s.startTime.isAfter(
+          weekStart.subtract(const Duration(seconds: 1)),
+        ) &&
+            s.startTime.isBefore(weekEnd.add(const Duration(days: 1))),
+      )
           .length;
       counts.add(count);
     }
@@ -535,7 +654,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
     final counts = _getLast4WeeksCounts(history);
     return List.generate(
       4,
-      (i) => BarChartGroupData(
+          (i) => BarChartGroupData(
         x: i,
         barRods: [
           BarChartRodData(
@@ -621,6 +740,9 @@ class _ProgressScreenState extends State<ProgressScreen> {
   }
 }
 
+// Rest of the widget classes remain the same as in the original file...
+// _StatCard, _Bar, _InsightCard, _AchievementCard, _AllAchievementsSheet, _calculateStatsStatic
+
 class _StatCard extends StatelessWidget {
   final IconData icon;
   final Color iconColor;
@@ -682,51 +804,6 @@ class _StatCard extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-class _Bar extends StatelessWidget {
-  final String label;
-  final double value; // 0.0 - 1.0
-  const _Bar({required this.label, required this.value});
-
-  @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        // Reserve space for the label and spacing
-        final double labelHeight = 20;
-        final double spacing = 8;
-        final double maxBarHeight =
-            constraints.maxHeight - labelHeight - spacing;
-        final double barHeight = (maxBarHeight > 0 ? maxBarHeight : 0) * value;
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            Container(
-              width: 28,
-              height: barHeight,
-              decoration: BoxDecoration(
-                color: AppTheme.primary,
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            SizedBox(height: spacing),
-            SizedBox(
-              height: labelHeight,
-              child: Center(
-                child: Text(
-                  label,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppTheme.textSecondary,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        );
-      },
     );
   }
 }
@@ -1010,9 +1087,9 @@ class _AllAchievementsSheet extends StatelessWidget {
                                 a['title'] as String,
                                 style: Theme.of(context).textTheme.bodyLarge
                                     ?.copyWith(
-                                      fontWeight: FontWeight.w700,
-                                      color: textColor,
-                                    ),
+                                  fontWeight: FontWeight.w700,
+                                  color: textColor,
+                                ),
                               ),
                               const SizedBox(height: 2),
                               Text(
@@ -1097,18 +1174,18 @@ class _AllAchievementsSheet extends StatelessWidget {
 }
 
 // Helper for static context
-Map<String, int> _calculateStatsStatic(List<dynamic> history) {
+Map<String, dynamic> _calculateStatsStatic(List<dynamic> history) {
   final now = DateTime.now();
   DateTime start = DateTime(now.year, now.month, 1);
   final filtered = history.where((s) => s.startTime.isAfter(start)).toList();
   int workouts = filtered.length;
-  int calories = filtered.fold<int>(
+  int calories = filtered.fold(
     0,
-    (sum, s) => sum + ((s.caloriesBurned ?? 0) as int),
+        (sum, s) => sum + ((s.caloriesBurned ?? 0) as int),
   );
-  int minutes = filtered.fold<int>(
+  int minutes = filtered.fold(
     0,
-    (sum, s) => sum + (s.duration.inMinutes as int),
+        (sum, s) => sum + (s.duration.inMinutes as int),
   );
   int streak = 0;
   DateTime current = now;
@@ -1116,10 +1193,10 @@ Map<String, int> _calculateStatsStatic(List<dynamic> history) {
     final dayWorkouts = filtered
         .where(
           (s) =>
-              s.startTime.year == current.year &&
-              s.startTime.month == current.month &&
-              s.startTime.day == current.day,
-        )
+      s.startTime.year == current.year &&
+          s.startTime.month == current.month &&
+          s.startTime.day == current.day,
+    )
         .toList();
     if (dayWorkouts.isEmpty) break;
     streak++;

@@ -311,4 +311,136 @@ class DataService {
       return false;
     }
   }
+
+  /// Forces a fresh reload of workout history with optional error handling
+  Future<List<WorkoutSession>> refreshWorkoutHistory() async {
+    try {
+      // Clear the cache to ensure fresh data
+      clearWorkoutHistoryCache();
+
+      // Force reload from storage
+      final prefs = await _getPrefs();
+      final jsonString = prefs.getString(_workoutHistoryKey);
+
+      if (jsonString == null) {
+        _workoutHistoryCache = [];
+        return [];
+      }
+
+      final List<dynamic> jsonList = json.decode(jsonString);
+      _workoutHistoryCache = jsonList.map((json) => WorkoutSession.fromJson(json)).toList();
+
+      return _workoutHistoryCache!;
+    } catch (e) {
+      debugPrint('Error refreshing workout history: $e');
+      // Return cached data if available, empty list otherwise
+      return _workoutHistoryCache ?? [];
+    }
+  }
+
+  /// Refreshes user stats and returns updated statistics
+  Future<Map<String, dynamic>> refreshWorkoutStats() async {
+    try {
+      final history = await refreshWorkoutHistory();
+      return await getWorkoutStats();
+    } catch (e) {
+      debugPrint('Error refreshing workout stats: $e');
+      // Return basic stats if refresh fails
+      return {
+        'totalWorkouts': 0,
+        'totalDuration': 0,
+        'totalCalories': 0,
+        'streakDays': 0,
+        'favoriteWorkout': null,
+        'averageFormScore': 0.0,
+      };
+    }
+  }
+
+  /// Validates data integrity during refresh operations
+  Future<bool> validateDataIntegrity() async {
+    try {
+      final history = await getWorkoutHistory();
+      final preferences = await getUserPreferences();
+      final profile = await getUserProfile();
+
+      // Basic validation checks
+      bool isValid = true;
+
+      // Check if workout history is properly formatted
+      for (final session in history) {
+        if (session.plan.name.isEmpty || session.startTime == null) {
+          isValid = false;
+          break;
+        }
+      }
+
+      // Check if essential preferences exist
+      if (!preferences.containsKey('theme') || !preferences.containsKey('notifications')) {
+        isValid = false;
+      }
+
+      // Check if profile has essential fields
+      if (!profile.containsKey('name') || !profile.containsKey('joinDate')) {
+        isValid = false;
+      }
+
+      return isValid;
+    } catch (e) {
+      debugPrint('Error validating data integrity: $e');
+      return false;
+    }
+  }
+
+  /// Performs a comprehensive refresh of all app data
+  Future<Map<String, dynamic>> performComprehensiveRefresh() async {
+    final Map<String, dynamic> refreshResults = {
+      'success': false,
+      'workoutHistoryUpdated': false,
+      'preferencesUpdated': false,
+      'profileUpdated': false,
+      'errors': <String>[],
+      'timestamp': DateTime.now(),
+    };
+
+    try {
+      // Refresh workout history
+      try {
+        await refreshWorkoutHistory();
+        refreshResults['workoutHistoryUpdated'] = true;
+      } catch (e) {
+        refreshResults['errors'].add('Failed to refresh workout history: $e');
+      }
+
+      // Validate data integrity
+      final isDataValid = await validateDataIntegrity();
+      if (!isDataValid) {
+        refreshResults['errors'].add('Data integrity validation failed');
+      }
+
+      // If no critical errors, mark as successful
+      refreshResults['success'] = refreshResults['errors'].isEmpty;
+
+      return refreshResults;
+    } catch (e) {
+      refreshResults['errors'].add('Comprehensive refresh failed: $e');
+      return refreshResults;
+    }
+  }
+
+  /// Gets the last refresh timestamp for UI feedback
+  Future<DateTime?> getLastRefreshTimestamp() async {
+    final prefs = await _getPrefs();
+    final timestampString = prefs.getString('last_refresh_timestamp');
+    if (timestampString != null) {
+      return DateTime.tryParse(timestampString);
+    }
+    return null;
+  }
+
+  /// Updates the last refresh timestamp
+  Future<void> updateLastRefreshTimestamp() async {
+    final prefs = await _getPrefs();
+    await prefs.setString('last_refresh_timestamp', DateTime.now().toIso8601String());
+  }
 } 
