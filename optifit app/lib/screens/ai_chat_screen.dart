@@ -10,6 +10,7 @@ import 'video_viewer_screen.dart';
 import 'dart:async';
 import 'dart:convert';
 import '../config/api_constants.dart';
+import 'package:video_player/video_player.dart';
 
 class AIChatScreen extends StatefulWidget {
   const AIChatScreen({super.key});
@@ -159,14 +160,243 @@ class _AIChatScreenState extends State<AIChatScreen>
     await onComplete();
   }
 
+  Future<Map<String, dynamic>> _validateVideoFile(PlatformFile file) async {
+    try {
+      if (file.path == null) {
+        return {
+          'isValid': false,
+          'error': 'Unable to access the selected file.',
+        };
+      }
+
+      final videoFile = File(file.path!);
+
+      if (!await videoFile.exists()) {
+        return {'isValid': false, 'error': 'Selected file does not exist.'};
+      }
+
+      final fileSizeInBytes = await videoFile.length();
+      final fileSizeInMB = fileSizeInBytes / (1024 * 1024);
+
+      if (fileSizeInMB > 50) {
+        return {
+          'isValid': false,
+          'error':
+              'Video file size (${fileSizeInMB.toStringAsFixed(1)} MB) exceeds the 50 MB limit.',
+        };
+      }
+
+      final durationResult = await _getVideoDuration(videoFile);
+      if (!durationResult['success']) {
+        return {'isValid': false, 'error': durationResult['error']};
+      }
+
+      if (durationResult['duration'] > 15) {
+        return {
+          'isValid': false,
+          'error':
+              'Video duration (${durationResult['duration']} seconds) exceeds the 15-second limit.',
+        };
+      }
+
+      return {'isValid': true, 'error': ''};
+    } catch (e) {
+      return {'isValid': false, 'error': 'Error validating video file: $e'};
+    }
+  }
+
+  Future<Map<String, dynamic>> _getVideoDuration(File videoFile) async {
+    VideoPlayerController? controller;
+    try {
+      controller = VideoPlayerController.file(videoFile);
+      await controller.initialize();
+
+      final duration = controller.value.duration;
+      final durationInSeconds = duration.inSeconds;
+
+      return {'success': true, 'duration': durationInSeconds, 'error': ''};
+    } catch (e) {
+      return {
+        'success': false,
+        'duration': 0,
+        'error':
+            'Unable to determine video duration. Please ensure the file is a valid video format.',
+      };
+    } finally {
+      controller?.dispose();
+    }
+  }
+
+  void _showValidationErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: Row(
+            children: [
+              Icon(Icons.error_outline, color: Colors.red),
+              const SizedBox(width: 8),
+              const Text('Upload Error'),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(message),
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.orange.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.orange.withOpacity(0.3)),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.lightbulb_outline,
+                      color: Colors.orange,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Tip: Use video editing apps to trim duration or compress file size.',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.orange.shade700,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            ElevatedButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<bool> _showVideoUploadInstructionDialog() async {
+    return await showDialog<bool>(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              title: Row(
+                children: [
+                  Icon(Icons.video_library, color: AppTheme.primary),
+                  const SizedBox(width: 8),
+                  const Text('Upload Video'),
+                ],
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: AppTheme.primary.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: AppTheme.primary.withOpacity(0.3),
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.info_outline,
+                              color: AppTheme.primary,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 8),
+                            const Text(
+                              'Video Requirements:',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        const Text('• Duration: Less than 15 seconds'),
+                        const Text('• File size: Under 50 MB'),
+                        const Text(
+                          '• Supported formats: MP4, MOV, AVI, MKV, WEBM, 3GP',
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Please upload a video less than 15 seconds and under 50 MB.',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: AppTheme.primary,
+                    ),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: const Text('Cancel'),
+                ),
+                ElevatedButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.primary,
+                    foregroundColor: Colors.white,
+                  ),
+                  child: const Text('Select Video'),
+                ),
+              ],
+            );
+          },
+        ) ??
+        false;
+  }
+
   void _onSuggestionTap(String suggestion) {
     _onSendMessage(suggestion);
   }
 
   void _onUploadVideo() async {
-    final result = await FilePicker.platform.pickFiles(type: FileType.video);
+    // Show instruction dialog first
+    final shouldProceed = await _showVideoUploadInstructionDialog();
+    if (!shouldProceed) return;
+
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['mp4', 'mov', 'avi', 'mkv', 'webm', '3gp'],
+      allowMultiple: false,
+    );
+
     if (result == null || result.files.isEmpty) return;
+
     final file = result.files.first;
+
+    // Validate video file
+    final validationResult = await _validateVideoFile(file);
+    if (!validationResult['isValid']) {
+      _showValidationErrorDialog(validationResult['error']);
+      return;
+    }
+
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => _UploadDialog(file: file),
@@ -459,18 +689,18 @@ class _AIChatScreenState extends State<AIChatScreen>
             Expanded(
               //  Listen to user's scroll to detect if they are manually scrolling
 
-            child: NotificationListener<UserScrollNotification>(
+              child: NotificationListener<UserScrollNotification>(
                 onNotification: (notification){
                   // If user scrolls forward (up) or reverse (down)
                   if((notification.direction == ScrollDirection.forward) ||
                   (notification.direction == ScrollDirection.reverse)){
                     //  Check if user is still at the bottom
-                      if (_scrollController.hasClients) {
+                    if (_scrollController.hasClients) {
                         final atBottom = _scrollController.offset >=
-                            _scrollController.position.maxScrollExtent - 50;
-                        // If at bottom → allow auto-scroll, else pause auto-scroll
-                        _shouldAutoScroll = atBottom;
-                      }
+                          _scrollController.position.maxScrollExtent - 50;
+                      // If at bottom → allow auto-scroll, else pause auto-scroll
+                      _shouldAutoScroll = atBottom;
+                    }
                   }
                   return false; // Don't stop the scroll event from propagating
                 },
