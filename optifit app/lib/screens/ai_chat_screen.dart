@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/rendering.dart';
 import '../theme/theme.dart';
+import '../widgets/loading_overlay.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'dart:io';
 import 'package:http/http.dart' as http;
@@ -411,7 +412,7 @@ class _AIChatScreenState extends State<AIChatScreen>
     setState(() {
       _addMessage(
         _ChatMessage(
-          text: 'AI is analyzing your form',
+          text: 'Uploading and analyzing your video...',
           isUser: false,
           isAnimated: true,
         ),
@@ -583,7 +584,9 @@ class _AIChatScreenState extends State<AIChatScreen>
     if (_isUploading) {
       return const Padding(
         padding: EdgeInsets.all(16),
-        child: LinearProgressIndicator(),
+        child: VideoUploadLoading(
+          message: 'Analyzing your squat form...',
+        ),
       );
     }
     if (_annotatedVideoUrl != null) {
@@ -674,7 +677,10 @@ class _AIChatScreenState extends State<AIChatScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return LoadingOverlay(
+      isLoading: _isUploading,
+      message: 'Processing video analysis...',
+      child: Scaffold(
       backgroundColor: AppTheme.background,
       appBar: AppBar(
         title: const Text('AI Coach'),
