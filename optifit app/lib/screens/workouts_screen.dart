@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'create_workout_screen.dart';
 import '../services/custom_workout_service.dart';
 import '../theme/theme.dart';
+import '../widgets/loading_overlay.dart';
 import '../models/workout_models.dart';
 import 'workout_execution_screen.dart';
 import '../services/workout_history_service.dart';
@@ -759,7 +760,10 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
                   ),
                   const SizedBox(height: 16),
                   if (_loadingHistory)
-                    const Center(child: CircularProgressIndicator())
+                    LoadingListSkeleton(
+                      itemCount: 3,
+                      itemBuilder: () => const ShimmerWorkoutCard(),
+                    )
                   else if (completedWorkouts.isEmpty)
                     Container(
                       width: double.infinity,

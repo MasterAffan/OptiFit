@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/theme.dart';
+import '../widgets/loading_overlay.dart';
 import 'start_workout_screen.dart';
 import 'schedule_screen.dart';
 import '../services/data_service.dart';
@@ -222,9 +223,36 @@ class _ProgressScreenState extends State<ProgressScreen> {
     return FutureBuilder<List<dynamic>>(
       future: _futureHistory,
       builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Scaffold(
+            backgroundColor: AppTheme.background,
+            body: const FullScreenLoading(
+              message: 'Loading your progress data...',
+            ),
+          );
+        }
+        
+        if (snapshot.hasError) {
+          return Scaffold(
+            backgroundColor: AppTheme.background,
+            body: Center(
+              child: ErrorWidget(
+                message: 'Failed to load progress data',
+                actionText: 'Retry',
+                onAction: () {
+                  _loadData();
+                },
+              ),
+            ),
+          );
+        }
+        
         if (!snapshot.hasData) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
+          return Scaffold(
+            backgroundColor: AppTheme.background,
+            body: const FullScreenLoading(
+              message: 'Preparing your progress dashboard...',
+            ),
           );
         }
         final _workoutHistory = snapshot.data!;
@@ -372,57 +400,84 @@ class _ProgressScreenState extends State<ProgressScreen> {
                       ),
                       const SizedBox(height: 16),
 
-                      // 2x2 stat grid
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _StatCard(
-                              icon: Icons.track_changes,
-                              iconColor: AppTheme.primary,
-                              value: stats['workouts'].toString(),
-                              label: 'Workouts',
-                              delta: '',
-                              deltaColor: AppTheme.success,
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: _StatCard(
-                              icon: Icons.local_fire_department,
-                              iconColor: AppTheme.warning,
-                              value: stats['calories'].toString(),
-                              label: 'Calories',
-                              delta: '',
-                              deltaColor: AppTheme.success,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _StatCard(
-                              icon: Icons.access_time,
-                              iconColor: Colors.purple,
-                              value: stats['minutes'].toString(),
-                              label: 'Minutes',
-                              delta: '',
-                              deltaColor: AppTheme.success,
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: _StatCard(
-                              icon: Icons.flash_on,
-                              iconColor: AppTheme.success,
-                              value: stats['streak'].toString(),
-                              label: 'Day Streak',
-                              delta: '',
-                              deltaColor: AppTheme.success,
-                            ),
-                          ),
-                        ],
+                      // 2x2 stat grid with shimmer loading
+                      AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 300),
+                        child: _isRefreshing
+                            ? Column(
+                                children: [
+                                  Row(
+                                    children: [
+                                      const Expanded(child: ShimmerStatCard()),
+                                      const SizedBox(width: 16),
+                                      const Expanded(child: ShimmerStatCard()),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Row(
+                                    children: [
+                                      const Expanded(child: ShimmerStatCard()),
+                                      const SizedBox(width: 16),
+                                      const Expanded(child: ShimmerStatCard()),
+                                    ],
+                                  ),
+                                ],
+                              )
+                            : Column(
+                                children: [
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: _StatCard(
+                                          icon: Icons.track_changes,
+                                          iconColor: AppTheme.primary,
+                                          value: stats['workouts'].toString(),
+                                          label: 'Workouts',
+                                          delta: '',
+                                          deltaColor: AppTheme.success,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 16),
+                                      Expanded(
+                                        child: _StatCard(
+                                          icon: Icons.local_fire_department,
+                                          iconColor: AppTheme.warning,
+                                          value: stats['calories'].toString(),
+                                          label: 'Calories',
+                                          delta: '',
+                                          deltaColor: AppTheme.success,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: _StatCard(
+                                          icon: Icons.access_time,
+                                          iconColor: Colors.purple,
+                                          value: stats['minutes'].toString(),
+                                          label: 'Minutes',
+                                          delta: '',
+                                          deltaColor: AppTheme.success,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 16),
+                                      Expanded(
+                                        child: _StatCard(
+                                          icon: Icons.flash_on,
+                                          iconColor: AppTheme.success,
+                                          value: stats['streak'].toString(),
+                                          label: 'Day Streak',
+                                          delta: '',
+                                          deltaColor: AppTheme.success,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
                       ),
                       const SizedBox(height: 32),
 
@@ -435,94 +490,99 @@ class _ProgressScreenState extends State<ProgressScreen> {
                       ),
                       const SizedBox(height: 16),
 
-                      // Real bar chart for workout frequency
-                      Container(
-                        width: double.infinity,
-                        height: 220,
-                        padding: AppTheme.cardPadding,
-                        decoration: BoxDecoration(
-                          color: AppTheme.cardBackground,
-                          borderRadius: BorderRadius.circular(
-                            AppTheme.cardRadius,
-                          ),
-                          boxShadow: AppTheme.cardShadow,
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Expanded(
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8.0,
-                                ),
-                                child: BarChart(
-                                  BarChartData(
-                                    alignment: BarChartAlignment.spaceAround,
-                                    maxY:
-                                    _getMaxWorkoutsPerWeek(
-                                      _workoutHistory,
-                                    ).toDouble() +
-                                        1,
-                                    barTouchData: BarTouchData(enabled: false),
-                                    titlesData: FlTitlesData(
-                                      leftTitles: AxisTitles(
-                                        sideTitles: SideTitles(
-                                          showTitles: true,
-                                          reservedSize: 28,
-                                          getTitlesWidget:
-                                              (double value, TitleMeta meta) {
-                                            if (value % 1 != 0)
-                                              return const SizedBox.shrink();
-                                            return Text(
-                                              value.toInt().toString(),
-                                              style: Theme.of(
-                                                context,
-                                              ).textTheme.bodySmall,
-                                            );
-                                          },
-                                          interval: 1,
-                                        ),
-                                      ),
-                                      bottomTitles: AxisTitles(
-                                        sideTitles: SideTitles(
-                                          showTitles: true,
-                                          getTitlesWidget:
-                                              (double value, TitleMeta meta) {
-                                            final weekLabels =
-                                            _getLast4WeekLabels();
-                                            return Text(
-                                              weekLabels[value.toInt()],
-                                              style: Theme.of(
-                                                context,
-                                              ).textTheme.bodySmall,
-                                            );
-                                          },
-                                        ),
-                                      ),
-                                      rightTitles: AxisTitles(
-                                        sideTitles: SideTitles(showTitles: false),
-                                      ),
-                                      topTitles: AxisTitles(
-                                        sideTitles: SideTitles(showTitles: false),
-                                      ),
-                                    ),
-                                    borderData: FlBorderData(show: false),
-                                    gridData: FlGridData(show: false),
-                                    barGroups: _getLast4WeeksBarGroups(
-                                      _workoutHistory,
-                                    ),
+                      // Real bar chart for workout frequency with shimmer loading
+                      AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 300),
+                        child: _isRefreshing
+                            ? const ShimmerProgressChart()
+                            : Container(
+                                width: double.infinity,
+                                height: 220,
+                                padding: AppTheme.cardPadding,
+                                decoration: BoxDecoration(
+                                  color: AppTheme.cardBackground,
+                                  borderRadius: BorderRadius.circular(
+                                    AppTheme.cardRadius,
                                   ),
+                                  boxShadow: AppTheme.cardShadow,
+                                ),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Expanded(
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8.0,
+                                        ),
+                                        child: BarChart(
+                                          BarChartData(
+                                            alignment: BarChartAlignment.spaceAround,
+                                            maxY:
+                                            _getMaxWorkoutsPerWeek(
+                                              _workoutHistory,
+                                            ).toDouble() +
+                                                1,
+                                            barTouchData: BarTouchData(enabled: false),
+                                            titlesData: FlTitlesData(
+                                              leftTitles: AxisTitles(
+                                                sideTitles: SideTitles(
+                                                  showTitles: true,
+                                                  reservedSize: 28,
+                                                  getTitlesWidget:
+                                                      (double value, TitleMeta meta) {
+                                                    if (value % 1 != 0)
+                                                      return const SizedBox.shrink();
+                                                    return Text(
+                                                      value.toInt().toString(),
+                                                      style: Theme.of(
+                                                        context,
+                                                      ).textTheme.bodySmall,
+                                                    );
+                                                  },
+                                                  interval: 1,
+                                                ),
+                                              ),
+                                              bottomTitles: AxisTitles(
+                                                sideTitles: SideTitles(
+                                                  showTitles: true,
+                                                  getTitlesWidget:
+                                                      (double value, TitleMeta meta) {
+                                                    final weekLabels =
+                                                    _getLast4WeekLabels();
+                                                    return Text(
+                                                      weekLabels[value.toInt()],
+                                                      style: Theme.of(
+                                                        context,
+                                                      ).textTheme.bodySmall,
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+                                              rightTitles: AxisTitles(
+                                                sideTitles: SideTitles(showTitles: false),
+                                              ),
+                                              topTitles: AxisTitles(
+                                                sideTitles: SideTitles(showTitles: false),
+                                              ),
+                                            ),
+                                            borderData: FlBorderData(show: false),
+                                            gridData: FlGridData(show: false),
+                                            barGroups: _getLast4WeeksBarGroups(
+                                              _workoutHistory,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 16),
+                                    Text(
+                                      'Workouts completed per week',
+                                      style: Theme.of(context).textTheme.bodyMedium
+                                          ?.copyWith(color: AppTheme.textSecondary),
+                                    ),
+                                  ],
                                 ),
                               ),
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              'Workouts completed per week',
-                              style: Theme.of(context).textTheme.bodyMedium
-                                  ?.copyWith(color: AppTheme.textSecondary),
-                            ),
-                          ],
-                        ),
                       ),
                       const SizedBox(height: 32),
 
@@ -537,9 +597,43 @@ class _ProgressScreenState extends State<ProgressScreen> {
                       FutureBuilder<List<Map<String, String>>>(
                         future: _fetchAIInsights(_workoutHistory),
                         builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return const LoadingWidget(
+                              message: 'Generating AI insights...',
+                              size: 30,
+                            );
+                          }
+                          
+                          if (snapshot.hasError) {
+                            return Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: AppTheme.error.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: AppTheme.error.withOpacity(0.3)),
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(Icons.error, color: AppTheme.error, size: 20),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      'Failed to load AI insights',
+                                      style: TextStyle(
+                                        color: AppTheme.error,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
+                          
                           if (!snapshot.hasData) {
-                            return const Center(
-                              child: CircularProgressIndicator(),
+                            return const LoadingWidget(
+                              message: 'Preparing insights...',
+                              size: 30,
                             );
                           }
                           final insights = snapshot.data!;

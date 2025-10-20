@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../theme/theme.dart';
 import '../widgets/app_button.dart';
+import '../widgets/loading_overlay.dart';
 import 'start_workout_screen.dart';
 import 'schedule_screen.dart';
 import '../services/data_service.dart';
@@ -51,10 +52,38 @@ class _HomeScreenState extends State<HomeScreen> {
             child: FutureBuilder<Map<String, dynamic>>(
               future: _futureStats,
               builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.7,
+                    child: const LoadingWidget(
+                      message: 'Loading your fitness data...',
+                      size: 50,
+                    ),
+                  );
+                }
+                
+                if (snapshot.hasError) {
+                  return SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.7,
+                    child: ErrorWidget(
+                      message: 'Failed to load workout stats',
+                      actionText: 'Retry',
+                      onAction: () {
+                        setState(() {
+                          _futureStats = DataService().getWorkoutStats();
+                        });
+                      },
+                    ),
+                  );
+                }
+                
                 if (!snapshot.hasData) {
                   return SizedBox(
                     height: MediaQuery.of(context).size.height * 0.7,
-                    child: const Center(child: CircularProgressIndicator()),
+                    child: const LoadingWidget(
+                      message: 'Preparing your dashboard...',
+                      size: 50,
+                    ),
                   );
                 }
                 final stats = snapshot.data!;
@@ -185,6 +214,45 @@ class _HomeScreenState extends State<HomeScreen> {
     return FutureBuilder<Map<String, dynamic>>(
       future: DataService().getUserProfile(),
       builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 200,
+                      height: 24,
+                      decoration: BoxDecoration(
+                        color: AppTheme.divider,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      width: 150,
+                      height: 16,
+                      decoration: BoxDecoration(
+                        color: AppTheme.divider,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: AppTheme.divider,
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ],
+          );
+        }
+        
         final profileImage = snapshot.data?['profileImage'];
         final userName = snapshot.data?['name'] ?? 'Fitness Enthusiast';
         return Row(
