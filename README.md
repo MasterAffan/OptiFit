@@ -1,7 +1,6 @@
 <div align="center">
   <img src="optifit app/assets/applogo.png" alt="OptiFit Logo" width="150" height="150">
   <h1>OptiFit: AI-Powered Fitness Trainer</h1>
-  <p><strong>🏆 Selected for GirlScript Summer of Code 2025 (GSSoC '25) 🏆</strong></p>
   <p>Transform your workouts with AI-driven form analysis and personalized feedback.</p>
   <a href="https://github.com/MasterAffan/optifit/stargazers">
     <img src="https://img.shields.io/github/stars/MasterAffan/optifit?style=social" alt="GitHub Stars">
@@ -19,27 +18,20 @@
 
 ---
 
-## 🚀 Join GSSoC '25!
+## 🚀 Join Hacktoberfest 2025!
 
-**OptiFit is participating in GirlScript Summer of Code 2025!** This is your chance to:
+**OptiFit is participating in Hacktoberfest 2025!** This is your chance to:
 
-- ✅ **Earn points** towards your GSSoC certification
+- ✅ **Earn points** towards your Hacktoberfest certification
 - 🎓 **Learn** from real-world open source development
 - 🤝 **Collaborate** with developers worldwide
 - 🏆 **Build** something meaningful for the fitness community
 
 ### 🎯 How to Participate
 
-1. **Find an Issue:** Browse our [Issues](https://github.com/MasterAffan/optifit/issues) with labels `gssoc`, `level1`, `level2`, or `level3`
-2. **Get Assigned:** Comment on the issue with `gssoc` tag to get assigned
+1. **Find an Issue:** Browse our [Issues](https://github.com/MasterAffan/optifit/issues) with label `Hacktoberfest`
+2. **Get Assigned:** Comment on the issue with `Hacktoberfest` tag to get assigned
 3. **Contribute:** Follow our [Contributing Guidelines](./CONTRIBUTING.md)
-4. **Earn Points:** Get points based on issue level + bonus for every PR!
-
-### 📊 Points System
-- **Every PR:** 1 point (participation bonus)
-- **Level 1:** 10 points
-- **Level 2:** 25 points  
-- **Level 3:** 45 points
 
 ---
 
