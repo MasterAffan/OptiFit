@@ -1,6 +1,6 @@
 # Contributing to OptiFit
 
-Thank you for your interest in contributing to OptiFit! This project is part of **GirlScript Summer of Code 2025 (GSSoC '25)**. Please read these guidelines carefully before contributing.
+Thank you for your interest in contributing to OptiFit! This project is part of **Hacktoberfest 2025**. Please read these guidelines carefully before contributing.
 
 ## How to Contribute
 
@@ -9,27 +9,20 @@ Thank you for your interest in contributing to OptiFit! This project is part of 
 1. **Check Existing Issues:** Go to the [Issues](https://github.com/your-username/optifit/issues) section of this repository.
 2. **Find Unassigned Issues:** Look for issues that are **not assigned** to anyone.
 3. **Create New Issues:** If all issues are assigned, examine the codebase and create a new issue for any bugs, improvements, or features you find.
-4. **Request Assignment:** Comment on the issue asking to be assigned. **Important:** You **must** mention that you are a **GSSoC '25 participant** by using the `gssoc` tag in your comment to be eligible for points.
+4. **Request Assignment:** Comment on the issue asking to be assigned.
 
 ### 2. Issue Assignment Process
 
 - **Admin Review:** The project admin will review your issue/assignment request.
 - **Assignment:** Once approved, the issue will be assigned to you.
-- **GSSoC Tag:** Only issues with the `gssoc` tag will be considered for GSSoC points.
 
-### 3. GSSoC Points System & Labels
+### 3. Hacktoberfest Points System & Labels
 
 **Labels:**
-- `gssoc` - Required for all GSSoC contributions
-- `level1` - 10 points
-- `level2` - 25 points
-- `level3` - 45 points
+- `Hacktoberfest` - Required for all Hacktoberfest contributions
 
 **Points System:**
-- **Every PR:** 1 point (participation bonus)
-- **Level 1 issues:** 10 points
-- **Level 2 issues:** 25 points
-- **Level 3 issues:** 45 points
+- **Every valuable PR you make in this repo with the hacktober fest would be counted for the points**
 
 ### 4. Development Workflow
 
