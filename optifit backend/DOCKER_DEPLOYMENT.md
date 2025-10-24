@@ -295,14 +295,3 @@ For issues related to Docker deployment:
 2. Verify system resources: `docker stats`
 3. Test API endpoints: `curl http://localhost:5000/ping`
 4. Check container health: `docker ps`
-
-## Screenshots
-
-### Successful Docker Build
-![Docker Build Success](screenshots/docker-build-success.png)
-
-### Container Running
-![Container Running](screenshots/container-running.png)
-
-### API Health Check
-![API Health Check](screenshots/api-health-check.png)
