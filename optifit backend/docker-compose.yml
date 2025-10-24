@@ -19,12 +19,6 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
-    deploy:
-      resources:
-        limits:
-          memory: 2G
-        reservations:
-          memory: 512M
   # Optional: Redis for caching (if needed in future)
   # redis:
   #   image: redis:7-alpine

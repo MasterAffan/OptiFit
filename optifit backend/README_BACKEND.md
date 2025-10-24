@@ -32,7 +32,7 @@ curl http://localhost:5000/ping
 ```
 
 For detailed Docker deployment instructions, see:
-- [**Docker Deployment Guide**](./DOCKER_DEPLOYMENT.md)
+- [**Docker Deployment Guide**](./deployment/DOCKER_DEPLOYMENT.md)
 
 ### Manual Setup
 

@@ -84,9 +84,9 @@ The following directories are mounted for persistence:
 
 The container includes a health check that:
 - Runs every 30 seconds
-- Times out after 30 seconds
+- Times out after 10 seconds
 - Retries 3 times
-- Has a 5-second start period
+- Has a 40-second start period
 
 ## Troubleshooting
 
