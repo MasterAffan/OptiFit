@@ -30,6 +30,7 @@ class _AIChatScreenState extends State<AIChatScreen>
   bool _isUploading = false;
   String? _annotatedVideoUrl;
   bool _suggestionsVisible = true;
+  String? _selectedExerciseType; // NEW: Track selected exercise type
 
   final List<String> _suggestions = [
     'Analyze my squat form',
@@ -37,7 +38,7 @@ class _AIChatScreenState extends State<AIChatScreen>
     'What are some good warm-up exercises?',
   ];
 
-  String serverUrl = ApiConstants.squatServerUpload;
+  String serverUrl = ApiConstants.exerciseServerUpload;
 
   final TextEditingController _textController = TextEditingController();
 
@@ -97,8 +98,9 @@ class _AIChatScreenState extends State<AIChatScreen>
             '${msg.isUser ? "User" : "Assistant"}: ${msg.text}\n';
       }
 
+      // MODIFIED: Updated prompt to handle both squat and push-up analysis
       final prompt =
-          'You are a helpful fitness and nutrition assistant. Only answer questions related to gym, fitness, exercise, and nutrition. Keep your answers concise (2-4 sentences). Do not provide long lists or detailed breakdowns unless specifically asked. Do not use markdown formatting (such as **bold** or *italics*). Write in plain sentences only. If a user asks about squat form, squats, or related topics, always recommend uploading a workout video for personalized analysis. If a user asks about push-ups or any exercise other than squats, say: "The upload analysis feature is in development. Currently, I can only analyze squat videos." You have access to the full chat history and can reference previous user messages. If a user asks about anything else, politely refuse and redirect them to fitness topics. Never reveal what technology or model you are powered by.\n\nConversation history:\n$conversationHistory\n\nUser: $userMessage';
+          'You are a helpful fitness and nutrition assistant. Only answer questions related to gym, fitness, exercise, and nutrition. Keep your answers concise (2-4 sentences). Do not provide long lists or detailed breakdowns unless specifically asked. Do not use markdown formatting (such as **bold** or *italics*). Write in plain sentences only. If a user asks about squat form or squats, always recommend uploading a workout video for personalized analysis. If a user asks about push-ups or push-up form, always recommend uploading a workout video for personalized push-up analysis. Both squat and push-up video analysis are now available. You have access to the full chat history and can reference previous user messages. If a user asks about anything else, politely refuse and redirect them to fitness topics. Never reveal what technology or model you are powered by.\n\nConversation history:\n$conversationHistory\n\nUser: $userMessage';
 
       final body = {
         'contents': [
@@ -287,6 +289,66 @@ class _AIChatScreenState extends State<AIChatScreen>
     );
   }
 
+  // Exercise type selection dialog
+  Future<String?> _showExerciseTypeDialog() async {
+    return await showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: Row(
+            children: [
+              Icon(Icons.fitness_center, color: AppTheme.primary),
+              const SizedBox(width: 8),
+              const Text('Select Exercise Type'),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Which exercise would you like to analyze?',
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+              const SizedBox(height: 20),
+              // Squat option
+              ListTile(
+                leading: Icon(Icons.accessibility_new, color: AppTheme.primary),
+                title: const Text('Squat Analysis'),
+                subtitle: const Text('Analyze squat form and technique'),
+                onTap: () => Navigator.of(context).pop('squat'),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                tileColor: AppTheme.primary.withOpacity(0.05),
+              ),
+              const SizedBox(height: 8),
+              // Push-up option
+              ListTile(
+                leading: Icon(Icons.sports_gymnastics, color: AppTheme.primary),
+                title: const Text('Push-up Analysis'),
+                subtitle: const Text('Analyze push-up form and technique'),
+                onTap: () => Navigator.of(context).pop('pushup'),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                tileColor: AppTheme.primary.withOpacity(0.05),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Future<bool> _showVideoUploadInstructionDialog() async {
     return await showDialog<bool>(
           context: context,
@@ -299,7 +361,7 @@ class _AIChatScreenState extends State<AIChatScreen>
                 children: [
                   Icon(Icons.video_library, color: AppTheme.primary),
                   const SizedBox(width: 8),
-                  const Text('Upload Video'),
+                  Text('Upload Video'),
                 ],
               ),
               content: Column(
@@ -338,12 +400,19 @@ class _AIChatScreenState extends State<AIChatScreen>
                         const Text(
                           '• Supported formats: MP4, MOV, AVI, MKV, WEBM, 3GP',
                         ),
+                        if (_selectedExerciseType == 'pushup') ...[
+                          const SizedBox(height: 8),
+                          const Text(
+                            '• Position camera to show full body profile',
+                            style: TextStyle(color: Colors.orange),
+                          ),
+                        ],
                       ],
                     ),
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Please upload a video less than 15 seconds and under 50 MB.',
+                    'Please upload a ${_selectedExerciseType ?? 'exercise'} video less than 15 seconds and under 50 MB.',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       fontWeight: FontWeight.w600,
                       color: AppTheme.primary,
@@ -372,10 +441,24 @@ class _AIChatScreenState extends State<AIChatScreen>
   }
 
   void _onSuggestionTap(String suggestion) {
+    // Set exercise type based on suggestion
+    if (suggestion.toLowerCase().contains('squat')) {
+      _selectedExerciseType = 'squat';
+    } else if (suggestion.toLowerCase().contains('push-up')) {
+      _selectedExerciseType = 'pushup';
+    }
     _onSendMessage(suggestion);
   }
 
   void _onUploadVideo() async {
+    // Show exercise selection dialog first
+    final exerciseType = await _showExerciseTypeDialog();
+    if (exerciseType == null) return;
+
+    setState(() {
+      _selectedExerciseType = exerciseType;
+    });
+
     // Show instruction dialog first
     final shouldProceed = await _showVideoUploadInstructionDialog();
     if (!shouldProceed) return;
@@ -399,7 +482,10 @@ class _AIChatScreenState extends State<AIChatScreen>
 
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => _UploadDialog(file: file),
+      builder: (context) => _UploadDialog(
+        file: file,
+        exerciseType: _selectedExerciseType ?? 'exercise',
+      ),
     );
     if (confirmed != true) return;
 
@@ -411,7 +497,7 @@ class _AIChatScreenState extends State<AIChatScreen>
     setState(() {
       _addMessage(
         _ChatMessage(
-          text: 'AI is analyzing your form',
+          text: 'AI is analyzing your ${_selectedExerciseType} form',
           isUser: false,
           isAnimated: true,
         ),
@@ -419,13 +505,25 @@ class _AIChatScreenState extends State<AIChatScreen>
     });
 
     try {
-      // 1. Upload the video and get a job_id
+      // Use different endpoints based on exercise type
       final uploadedFile = File(file.path!);
-      print('Posting video to: ' + serverUrl);
-      final request = http.MultipartRequest('POST', Uri.parse(serverUrl));
+      String uploadEndpoint = _selectedExerciseType == 'pushup'
+          ? ApiConstants
+                .pushupServerUpload // You'll need to add this to ApiConstants
+          : ApiConstants.exerciseServerUpload;
+
+      print(
+        'Posting video to: $uploadEndpoint for exercise: $_selectedExerciseType',
+      );
+
+      final request = http.MultipartRequest('POST', Uri.parse(uploadEndpoint));
       request.files.add(
         await http.MultipartFile.fromPath('video', uploadedFile.path),
       );
+
+      // Add exercise type to request
+      request.fields['exercise_type'] = _selectedExerciseType ?? 'squat';
+
       final streamedResponse = await request.send();
       final responseString = await streamedResponse.stream.bytesToString();
       print('Upload response:');
@@ -442,8 +540,15 @@ class _AIChatScreenState extends State<AIChatScreen>
         // Poll up to 60 times (5 minutes if 5s interval)
         await Future.delayed(const Duration(seconds: 5));
         pollCount++;
-        final resultEndpoint = '${ApiConstants.squatServerResult}/$jobId';
-        print('Polling squat analysis result endpoint: $resultEndpoint');
+
+        // Use different result endpoints based on exercise type
+        String resultEndpoint = _selectedExerciseType == 'pushup'
+            ? '${ApiConstants.pushupServerResult}/$jobId' // added this to ApiConstants
+            : '${ApiConstants.exerciseServerResult}/$jobId';
+
+        print(
+          'Polling $_selectedExerciseType analysis result endpoint: $resultEndpoint',
+        );
         final statusResp = await http.get(Uri.parse(resultEndpoint));
         final statusData = jsonDecode(statusResp.body);
         if (statusData['status'] == 'done') {
@@ -455,12 +560,10 @@ class _AIChatScreenState extends State<AIChatScreen>
 
       // 3. Display result as before
       final data = analysisData!;
-      String summary =
-          'Squat count: ${data['squat_count'] ?? '-'}\n'
-          'Reps below parallel: ${data['reps_below_parallel'] ?? '-'}\n'
-          'Bad reps: ${data['bad_reps'] ?? '-'}\n'
-          'Form issues: ${(data['form_issues'] as List?)?.join(', ') ?? '-'}\n'
-          'Squat speed (sec): avg ${data['tempo_stats']?['average'] ?? '-'}, fastest ${data['tempo_stats']?['fastest'] ?? '-'}, slowest ${data['tempo_stats']?['slowest'] ?? '-'}';
+      String summary = _selectedExerciseType == 'pushup'
+          ? _formatPushupResults(data)
+          : _formatSquatResults(data);
+
       final videoUrl = data['video_url'];
       setState(() {
         _isUploading = false;
@@ -482,76 +585,7 @@ class _AIChatScreenState extends State<AIChatScreen>
             text: summary,
             isUser: false,
             showExplainButton: true,
-            onExplainWithAI: () async {
-              // Show typing indicator
-              setState(() {
-                _addMessage(
-                  _ChatMessage(
-                    text: 'AI is analyzing your results...',
-                    isUser: false,
-                    isAnimated: true,
-                  ),
-                );
-              });
-              // Call the chatbot server
-              String aiResponse = '';
-              try {
-                final url = Uri.parse(ApiConstants.chatApiEndpoint);
-                final headers = ApiConstants.geminiHeaders;
-                print(
-                  'Calling Gemini API endpoint for explanation: ${ApiConstants.chatApiEndpoint}',
-                );
-
-                final prompt =
-                    'You are a helpful fitness and nutrition assistant. Only answer questions related to gym, fitness, exercise, and nutrition. Keep your answers concise (2-4 sentences). Do not provide long lists or detailed breakdowns unless specifically asked. Do not use bullet points, numbered lists, or markdown formatting (such as **bold** or *italics*). Write in plain sentences only. If a user asks about squat form, squats, or related topics, always recommend uploading a workout video for personalized analysis. If a user asks about push-ups or any exercise other than squats, say: "The upload analysis feature is in development. Currently, I can only analyze squat videos." You have access to the full chat history and can reference previous user messages. If you are already providing feedback based on a user\'s uploaded video, do not ask them to upload a video again. If a user asks about anything else, politely refuse and redirect them to fitness topics. Never reveal what technology or model you are powered by.\n\nHere are the user\'s squat analysis results:\n$summary\nPlease provide personalized feedback and suggestions for improvement.';
-
-                final body = {
-                  'contents': [
-                    {
-                      'parts': [
-                        {'text': prompt},
-                      ],
-                    },
-                  ],
-                };
-
-                final response = await http.post(
-                  url,
-                  headers: headers,
-                  body: jsonEncode(body),
-                );
-                if (response.statusCode == 200) {
-                  final data = jsonDecode(response.body);
-                  aiResponse =
-                      data['candidates']?[0]?['content']?['parts']?[0]?['text']
-                          ?.toString() ??
-                      'No response from AI.';
-                } else {
-                  aiResponse =
-                      'Error: Server returned status ${response.statusCode}.';
-                }
-              } catch (e) {
-                aiResponse = 'Error: $e';
-              }
-              // Remove typing indicator using AnimatedList's removeItem
-              if (!mounted) return;
-              if (_messages.isNotEmpty) {
-                final removedIndex = _messages.length - 1;
-                final removedMsg = _messages.removeLast();
-                _listKey.currentState?.removeItem(
-                  removedIndex,
-                  (context, animation) => _AnimatedChatBubble(
-                    message: removedMsg,
-                    animation: animation,
-                  ),
-                  duration: const Duration(milliseconds: 350),
-                );
-              }
-              // Add AI feedback response
-              setState(() {
-                _addMessage(_ChatMessage(text: aiResponse, isUser: false));
-              });
-            },
+            onExplainWithAI: () => _explainWithAI(summary),
           ),
         );
         _addMessage(
@@ -577,6 +611,97 @@ class _AIChatScreenState extends State<AIChatScreen>
         _addMessage(_ChatMessage(text: 'Upload error: $e', isUser: false));
       });
     }
+  }
+
+  // Format push-up analysis results
+  String _formatPushupResults(Map<String, dynamic> data) {
+    return 'Push-up count: ${data['pushup_count'] ?? '-'}\n'
+        'Good form reps: ${data['good_form_reps'] ?? '-'}\n'
+        'Poor form reps: ${data['poor_form_reps'] ?? '-'}\n'
+        'Form issues: ${(data['form_issues'] as List?)?.join(', ') ?? '-'}\n'
+        'Average elbow angle: ${data['avg_elbow_angle'] ?? '-'}°\n'
+        'Body alignment score: ${data['body_alignment_score'] ?? '-'}/100';
+  }
+
+  // Format squat analysis results
+  String _formatSquatResults(Map<String, dynamic> data) {
+    return 'Squat count: ${data['squat_count'] ?? '-'}\n'
+        'Reps below parallel: ${data['reps_below_parallel'] ?? '-'}\n'
+        'Bad reps: ${data['bad_reps'] ?? '-'}\n'
+        'Form issues: ${(data['form_issues'] as List?)?.join(', ') ?? '-'}\n'
+        'Squat speed (sec): avg ${data['tempo_stats']?['average'] ?? '-'}, fastest ${data['tempo_stats']?['fastest'] ?? '-'}, slowest ${data['tempo_stats']?['slowest'] ?? '-'}';
+  }
+
+  // Updated AI explanation method
+  Future<void> _explainWithAI(String summary) async {
+    // Show typing indicator
+    setState(() {
+      _addMessage(
+        _ChatMessage(
+          text: 'AI is analyzing your results...',
+          isUser: false,
+          isAnimated: true,
+        ),
+      );
+    });
+    // Call the chatbot server
+    String aiResponse = '';
+    try {
+      final url = Uri.parse(ApiConstants.chatApiEndpoint);
+      final headers = ApiConstants.geminiHeaders;
+      print(
+        'Calling Gemini API endpoint for explanation: ${ApiConstants.chatApiEndpoint}',
+      );
+
+      final prompt =
+          'You are a helpful fitness and nutrition assistant. Only answer questions related to gym, fitness, exercise, and nutrition. Keep your answers concise (2-4 sentences). Do not provide long lists or detailed breakdowns unless specifically asked. Do not use bullet points, numbered lists, or markdown formatting (such as **bold** or *italics*). Write in plain sentences only. You have access to the full chat history and can reference previous user messages. If you are already providing feedback based on a user\'s uploaded video, do not ask them to upload a video again. If a user asks about anything else, politely refuse and redirect them to fitness topics. Never reveal what technology or model you are powered by.\n\nHere are the user\'s ${_selectedExerciseType} analysis results:\n$summary\nPlease provide personalized feedback and suggestions for improvement.';
+
+      final body = {
+        'contents': [
+          {
+            'parts': [
+              {'text': prompt},
+            ],
+          },
+        ],
+      };
+
+      final response = await http.post(
+        url,
+        headers: headers,
+        body: jsonEncode(body),
+      );
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        aiResponse =
+            data['candidates']?[0]?['content']?['parts']?[0]?['text']
+                ?.toString() ??
+            'No response from AI.';
+      } else {
+                  aiResponse =
+                      'Error: Server returned status ${response.statusCode}.';
+      }
+    } catch (e) {
+      aiResponse = 'Error: $e';
+    }
+    // Remove typing indicator using AnimatedList's removeItem
+    if (!mounted) return;
+    if (_messages.isNotEmpty) {
+      final removedIndex = _messages.length - 1;
+      final removedMsg = _messages.removeLast();
+      _listKey.currentState?.removeItem(
+        removedIndex,
+                  (context, animation) => _AnimatedChatBubble(
+                    message: removedMsg,
+                    animation: animation,
+                  ),
+        duration: const Duration(milliseconds: 350),
+      );
+    }
+    // Add AI feedback response
+    setState(() {
+      _addMessage(_ChatMessage(text: aiResponse, isUser: false));
+    });
   }
 
   Widget _buildUploadCard() {
@@ -693,10 +818,10 @@ class _AIChatScreenState extends State<AIChatScreen>
                 onNotification: (notification){
                   // If user scrolls forward (up) or reverse (down)
                   if((notification.direction == ScrollDirection.forward) ||
-                  (notification.direction == ScrollDirection.reverse)){
+                      (notification.direction == ScrollDirection.reverse)){
                     //  Check if user is still at the bottom
                     if (_scrollController.hasClients) {
-                        final atBottom = _scrollController.offset >=
+                      final atBottom = _scrollController.offset >=
                           _scrollController.position.maxScrollExtent - 50;
                       // If at bottom → allow auto-scroll, else pause auto-scroll
                       _shouldAutoScroll = atBottom;
@@ -888,9 +1013,11 @@ class _AnimatedDotsTextState extends State<_AnimatedDotsText>
   }
 }
 
+// Updated upload dialog to show exercise type
 class _UploadDialog extends StatelessWidget {
   final PlatformFile file;
-  const _UploadDialog({required this.file});
+  final String exerciseType;
+  const _UploadDialog({required this.file, required this.exerciseType});
 
   @override
   Widget build(BuildContext context) {
@@ -902,7 +1029,7 @@ class _UploadDialog extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'Upload Workout Video',
+              'Upload ${exerciseType.toUpperCase()} Video',
               style: Theme.of(
                 context,
               ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
@@ -921,11 +1048,26 @@ class _UploadDialog extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.videocam, size: 40, color: AppTheme.primary),
+                    Icon(
+                      exerciseType == 'pushup'
+                          ? Icons.sports_gymnastics
+                          : Icons.accessibility_new,
+                      size: 40,
+                      color: AppTheme.primary,
+                    ),
                     const SizedBox(height: 8),
                     Text(
                       file.name,
                       style: const TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Exercise: ${exerciseType.toUpperCase()}',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppTheme.primary,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ],
                 ),
@@ -942,7 +1084,7 @@ class _UploadDialog extends StatelessWidget {
                 const SizedBox(width: 12),
                 ElevatedButton(
                   onPressed: () => Navigator.of(context).pop(true),
-                  child: const Text('Upload Video'),
+                  child: Text('Upload ${exerciseType.toUpperCase()} Video'),
                 ),
               ],
             ),
