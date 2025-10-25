@@ -1,6 +1,6 @@
 import os
 import uuid
-
+import mimetypes
 class APIError(Exception):
     def __init__(self, message, status_code=500):
         self.message = message
@@ -88,6 +88,14 @@ def validate_video_file(file):
             f"Unsupported file format '{file_ext}'. "
             f"Allowed formats: {', '.join(ALLOWED_EXTENSIONS)}"
         )
+    #mime type check
+    mime_type, _ = mimetypes.guess_type(file.filename)
+    if not mime_type or not mime_type.startswith('video/'):
+        raise UnsupportedMediaTypeError(f"Invalid MIME type: {mime_type}")
+
+    #reset point for later processing
+    file.seek(0)
+    return True
     
 
 # Validating the job request for getting the results
