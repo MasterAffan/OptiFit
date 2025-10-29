@@ -1,0 +1,21 @@
+{
+  "name": "optifit-webrtc-signaling",
+  "version": "1.0.0",
+  "description": "WebRTC signaling server for OptiFit live workout sessions",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "4.18.x",
+    "socket.io": "4.7.x"
+  },
+  "keywords": [
+    "webrtc",
+    "signaling",
+    "fitness",
+    "workout"
+  ],
+  "author": "OptiFit Team",
+  "license": "MIT"
+}
