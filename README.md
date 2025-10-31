@@ -1,52 +1,29 @@
 <div align="center">
-  <img src="optifit app/assets/applogo.png" alt="OptiFit Logo" width="150" height="150">
-  <h1>OptiFit: AI-Powered Fitness Trainer</h1>
-  <p>Transform your workouts with AI-driven form analysis and personalized feedback.</p>
-  <a href="https://github.com/MasterAffan/optifit/stargazers">
-    <img src="https://img.shields.io/github/stars/MasterAffan/optifit?style=social" alt="GitHub Stars">
-  </a>
-  <a href="https://github.com/MasterAffan/optifit/forks">
-    <img src="https://img.shields.io/github/forks/MasterAffan/optifit?style=social" alt="GitHub Forks">
-  </a>
+  <img src="optifit app/assets/applogo.png" alt="OptiFit Logo" width="200">
+
+# OptiFit 🏋️
+
+Your AI-Powered Personal Trainer
+
+  [![Contributors](https://img.shields.io/github/contributors/MasterAffan/OptiFit?style=flat-square)](https://github.com/MasterAffan/OptiFit/graphs/contributors)
+  [![Forks](https://img.shields.io/github/forks/MasterAffan/OptiFit?style=flat-square)](https://github.com/MasterAffan/OptiFit/network/members)
+  [![Stars](https://img.shields.io/github/stars/MasterAffan/OptiFit?style=flat-square)](https://github.com/MasterAffan/OptiFit/stargazers)
+  [![Issues](https://img.shields.io/github/issues/MasterAffan/OptiFit?style=flat-square)](https://github.com/MasterAffan/OptiFit/issues)
+  [![MIT License](https://img.shields.io/github/license/MasterAffan/OptiFit?style=flat-square)](https://github.com/MasterAffan/OptiFit/blob/main/LICENSE)
 </div>
 
----
-
-## 🌟 **Please Star This Repository!** ⭐
-
-**⭐ Star this repository if you find it helpful!** It's the best way to support the project and help it grow. Your stars motivate us to keep improving and adding new features!
-
----
-
-## 🚀 Join Hacktoberfest 2025!
-
-**OptiFit is participating in Hacktoberfest 2025!** This is your chance to:
-
-- ✅ **Earn points** towards your Hacktoberfest certification
-- 🎓 **Learn** from real-world open source development
-- 🤝 **Collaborate** with developers worldwide
-- 🏆 **Build** something meaningful for the fitness community
-
-### 🎯 How to Participate
-
-1. **Find an Issue:** Browse our [Issues](https://github.com/MasterAffan/optifit/issues) with label `Hacktoberfest`
-2. **Get Assigned:** Comment on the issue with `Hacktoberfest` tag to get assigned
-3. **Contribute:** Follow our [Contributing Guidelines](./CONTRIBUTING.md)
-
----
-
-## About OptiFit
+## 🎯 About OptiFit
 
 OptiFit is an innovative mobile application designed to revolutionize your workout experience. Using the power of AI, OptiFit analyzes your exercise form in real-time, providing immediate feedback to help you improve your technique, prevent injuries, and maximize your results. Whether you're a beginner or a seasoned athlete, OptiFit is your personal AI trainer, available anytime, anywhere.
 
-## Features
+## ✨ Features
 
-- **Real-Time Form Analysis:** Get instant feedback on your squat form, with more exercises to come.
-- **AI-Powered Chat:** Ask our AI assistant for fitness advice, workout plans, and nutritional guidance.
-- **Track Your Progress:** Monitor your performance over time with detailed statistics and charts.
-- **Personalized Workouts:** Coming soon: AI-generated workout plans tailored to your goals and abilities.
+- ✅ **Real-Time Form Analysis:** Get instant feedback on your squat form, with more exercises to come.
+- 🤖 **AI-Powered Chat:** Ask our AI assistant for fitness advice, workout plans, and nutritional guidance.
+- 📊 **Track Your Progress:** Monitor your performance over time with detailed statistics and charts.
+- 🏋️ **Personalized Workouts:** Coming soon: AI-generated workout plans tailored to your goals and abilities.
 
-## Project Structure
+## 📂 Project Structure
 
 This repository is a monorepo containing both the frontend mobile application and the backend server.
 
@@ -54,7 +31,6 @@ This repository is a monorepo containing both the frontend mobile application an
   - [**Frontend README**](./optifit%20app/README_FRONTEND.md)
 - **`optifit backend/`**: The Python-based Flask server that handles video processing and AI analysis.
   - [**Backend README**](./optifit%20backend/README_BACKEND.md)
-
 
 ## 🎥 Demo
 
@@ -64,35 +40,53 @@ This repository is a monorepo containing both the frontend mobile application an
   </a>
 </p>
 
-> The demo video is included in the repository under `optifit app/assets/videos/demo.mp4`.  
+> The demo video is included in the repository under `optifit app/assets/videos/demo.mp4`.
+>
 > Click the image above to open the video locally.
 
-## Getting Started
+## 🚀 Getting Started
 
 Ready to contribute? Follow our comprehensive setup guide to get both frontend and backend running:
 
 - [**Master Setup Guide**](./SETUP.md)
 
-## 🤝 Contributors
+## 📹 WebRTC Signaling Server
 
-A huge thank you to all the amazing contributors who have helped make OptiFit better!
+The `server.js` file provides a minimal backend signaling and room management implementation for live video workout sessions.
 
-<p align="center">
-  <a href="https://github.com/MasterAffan/optifit/graphs/contributors">
-    <img src="https://contrib.rocks/image?repo=MasterAffan/optifit" alt="Contributors" />
-  </a>
-</p>
+### Setup
 
-<!-- 
-If your name is not appearing in the contributors list above, please add it here manually. 
--->
-<sub><b>All contributors: Adez017, shubhranshu-sahu, Meghana-2124, Jai-76,Manar-Elhabbal7</b></sub>
+```bash
+npm install express@4.18.x socket.io@4.7.x
+node server.js
+```
 
+The server will listen on port 3000 by default.
 
-## Contributing
+### Features
 
-We welcome contributions from the community! Please read our [Contributing Guidelines](./CONTRIBUTING.md) for detailed instructions on how to contribute to this project.
+- Real-time signaling for WebRTC peer-to-peer connections
+- Room management for workout sessions
+- Broadcasting messages within rooms
 
-## License
+### Usage
 
-This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.
+Clients can connect via Socket.IO and join rooms to establish peer-to-peer video connections for collaborative workout sessions.
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions from everyone! Please check out our [Contributing Guide](CONTRIBUTING.md) for guidelines about how to proceed.
+
+## 📜 License
+
+Distributed under the MIT License. See `LICENSE` for more information.
+
+## 🌟 Show Your Support
+
+Give a ⭐️ if this project helped you!
+
+---
+
+Made with ❤️ by the OptiFit team
