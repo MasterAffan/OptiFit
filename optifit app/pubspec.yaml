@@ -43,7 +43,7 @@ dependencies:
   dotted_border: ^3.0.1
   share_plus: ^11.0.0
   flutter_launcher_icons: ^0.14.4
-  image_picker: ^1.1.2
+  image_picker: ^1.2.0
   flutter_dotenv: ^5.1.0
   flutter_local_notifications: ^17.2.3
   timezone: ^0.9.4
